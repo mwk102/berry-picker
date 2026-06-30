@@ -1,38 +1,109 @@
 import L from 'leaflet'
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
-import { mockFarms } from '../services/mockFarms'
+import { useEffect, useMemo, useRef } from 'react'
+import {
+  MapContainer,
+  Marker,
+  Popup,
+  TileLayer,
+  useMap,
+} from 'react-leaflet'
+import { farms as defaultFarms, redmondCenter } from '../data/farms'
 import './FarmMap.css'
 
-const REDMOND_CENTER = [47.674, -122.1215]
-
-const farmIcon = L.divIcon({
-  className: 'farm-marker',
+const selectedFarmIcon = L.divIcon({
+  className: 'farm-marker selected',
   html: '<span aria-hidden="true"></span>',
-  iconSize: [28, 28],
-  iconAnchor: [14, 28],
-  popupAnchor: [0, -28],
+  iconSize: [30, 30],
+  iconAnchor: [15, 30],
+  popupAnchor: [0, -30],
 })
 
-export function FarmMap({ farms = mockFarms }) {
+const defaultFarmIcon = L.divIcon({
+  className: 'farm-marker',
+  html: '<span aria-hidden="true"></span>',
+  iconSize: [30, 30],
+  iconAnchor: [15, 30],
+  popupAnchor: [0, -30],
+})
+
+function FarmMapController({ markerRefs, selectedFarm, selectedPosition }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (!selectedFarm) {
+      return
+    }
+
+    map.flyTo(selectedPosition, 14, {
+      duration: 0.75,
+    })
+
+    markerRefs.current[selectedFarm.id]?.openPopup()
+  }, [map, markerRefs, selectedFarm, selectedPosition])
+
+  return null
+}
+
+export function FarmMap({
+  farms = defaultFarms,
+  onSelectFarm,
+  selectedFarm,
+}) {
+  const markerRefs = useRef({})
+
+  const selectedPosition = useMemo(() => {
+    if (!selectedFarm) {
+      return redmondCenter
+    }
+
+    return [selectedFarm.latitude, selectedFarm.longitude]
+  }, [selectedFarm])
+
   return (
     <section className="farm-map" aria-label="Farm map">
       <MapContainer
-        center={REDMOND_CENTER}
+        center={redmondCenter}
         className="farm-map-canvas"
         scrollWheelZoom
-        zoom={13}
+        zoom={12}
       >
+        <FarmMapController
+          markerRefs={markerRefs}
+          selectedFarm={selectedFarm}
+          selectedPosition={selectedPosition}
+        />
+
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
         {farms.map((farm) => (
-          <Marker icon={farmIcon} key={farm.id} position={farm.position}>
+          <Marker
+            eventHandlers={{
+              click: () => onSelectFarm?.(farm),
+            }}
+            icon={selectedFarm?.id === farm.id ? selectedFarmIcon : defaultFarmIcon}
+            key={farm.id}
+            position={[farm.latitude, farm.longitude]}
+            ref={(marker) => {
+              if (marker) {
+                markerRefs.current[farm.id] = marker
+              }
+            }}
+          >
             <Popup>
               <div className="farm-popup">
                 <strong>{farm.name}</strong>
-                <span>{farm.crop}</span>
+                <span>{farm.berryTypes.join(', ')}</span>
+                <span className={`popup-status ${farm.status.toLowerCase()}`}>
+                  {farm.status}
+                </span>
+                <span>${farm.pricePerPound.toFixed(2)}/lb</span>
+                <span>{farm.city}</span>
+                <a href={farm.website} rel="noreferrer" target="_blank">
+                  Website
+                </a>
               </div>
             </Popup>
           </Marker>

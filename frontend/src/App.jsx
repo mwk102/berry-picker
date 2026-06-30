@@ -4,9 +4,9 @@ import { AppLayout } from './components/AppLayout'
 import { queryClient } from './services/queryClient'
 import { Admin } from './pages/Admin'
 import { FarmDetails } from './pages/FarmDetails'
-import { Home } from './pages/Home'
 import { Login } from './pages/Login'
 import { NotFound } from './pages/NotFound'
+import { MapPage } from './components/MapPage'
 
 function App() {
   return (
@@ -14,7 +14,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<AppLayout />}>
-            <Route index element={<Home />} />
+            <Route index element={<MapPage />} />
             <Route path="farms/:farmId" element={<FarmDetails />} />
             <Route path="admin" element={<Admin />} />
             <Route path="login" element={<Login />} />

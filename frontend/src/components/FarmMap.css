@@ -1,6 +1,6 @@
 .farm-map {
-  width: 100vw;
-  height: 100vh;
+  min-width: 0;
+  min-height: 0;
 }
 
 .farm-map-canvas {
@@ -23,6 +23,10 @@
   background: var(--color-berry);
   box-shadow: 0 10px 24px rgba(16, 37, 26, 0.28);
   transform: rotate(-45deg);
+  transition:
+    background-color 160ms ease,
+    box-shadow 160ms ease,
+    scale 160ms ease;
 }
 
 .farm-marker span::after {
@@ -33,17 +37,57 @@
   background: var(--color-lime);
 }
 
+.farm-marker.selected span {
+  background: var(--color-forest-900);
+  box-shadow: 0 14px 30px rgba(16, 37, 26, 0.38);
+  scale: 1.18;
+}
+
 .farm-popup {
   display: grid;
-  gap: 4px;
-  min-width: 160px;
+  gap: 6px;
+  min-width: 190px;
 }
 
 .farm-popup strong {
   color: var(--color-forest-900);
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
-.farm-popup span {
+.farm-popup span,
+.farm-popup a {
   color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.farm-popup a {
+  color: var(--color-leaf-700);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.popup-status {
+  width: fit-content;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 4px 8px;
+  text-transform: uppercase;
+}
+
+.popup-status.open {
+  background: var(--color-mint-100);
+  color: var(--color-leaf-700);
+}
+
+.popup-status.closed {
+  background: #f7e5e8;
+  color: var(--color-berry);
+}
+
+@media (max-width: 900px) {
+  .farm-map {
+    height: 58svh;
+    min-height: 420px;
+  }
 }
