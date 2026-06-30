@@ -1,12 +1,16 @@
 import { FarmCard } from './FarmCard'
+import { EmptyState } from './EmptyState'
 
-export function FarmList({ farms, selectedFarm, onSelectFarm }) {
+export function FarmList({ farms, onResetFilters, selectedFarm, onSelectFarm }) {
   if (farms.length === 0) {
     return (
-      <div className="empty-state">
-        <strong>No farms found</strong>
-        <p>Try widening the radius, raising the max price, or clearing search.</p>
-      </div>
+      <EmptyState
+        actionLabel="Reset filters"
+        onAction={onResetFilters}
+        title="No farms found"
+      >
+        Try widening the radius, raising the max price, or clearing search.
+      </EmptyState>
     )
   }
 

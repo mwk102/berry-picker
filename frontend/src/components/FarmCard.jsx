@@ -1,7 +1,8 @@
 import { formatDistance } from '../utils/distance'
+import { BerryChip } from './BerryChip'
+import { StatusBadge } from './StatusBadge'
 
 export function FarmCard({ farm, isSelected, onSelect }) {
-  const berrySummary = farm.berryTypes.join(', ')
   const price = `$${farm.pricePerPound.toFixed(2)}/lb`
 
   return (
@@ -17,19 +18,19 @@ export function FarmCard({ farm, isSelected, onSelect }) {
           <span className="farm-distance">
             {formatDistance(farm.distanceMiles)}
           </span>
-          <span className={`farm-status ${farm.status.toLowerCase()}`}>
-            {farm.status}
-          </span>
+          <StatusBadge status={farm.status} />
         </span>
 
         <span className="farm-card-name">{farm.name}</span>
         <span className="farm-card-description">{farm.description}</span>
 
+        <span className="berry-chip-list" aria-label={`${farm.name} berry types`}>
+          {farm.berryTypes.map((berryType) => (
+            <BerryChip key={berryType}>{berryType}</BerryChip>
+          ))}
+        </span>
+
         <span className="farm-meta-grid">
-          <span>
-            <strong>Berries</strong>
-            {berrySummary}
-          </span>
           <span>
             <strong>Price</strong>
             {price}

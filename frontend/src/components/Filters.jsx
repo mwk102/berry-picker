@@ -1,3 +1,5 @@
+import { Button } from './Button'
+
 const sortOptions = [
   { label: 'Nearest first', value: 'nearest' },
   { label: 'Lowest price', value: 'price' },
@@ -9,6 +11,7 @@ export function Filters({
   filters,
   maxAvailablePrice,
   onChange,
+  onReset,
   resultCount,
 }) {
   const updateFilter = (key, value) => {
@@ -21,7 +24,10 @@ export function Filters({
   return (
     <section className="filters" aria-label="Farm filters">
       <div className="filters-topline">
-        <span>{resultCount} results</span>
+        <span>{resultCount} farms</span>
+        <Button className="filters-reset" onClick={onReset} variant="ghost">
+          Reset
+        </Button>
       </div>
 
       <label className="filter-field search-field">

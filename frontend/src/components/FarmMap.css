@@ -45,8 +45,8 @@
 
 .farm-popup {
   display: grid;
-  gap: 6px;
-  min-width: 190px;
+  gap: 8px;
+  min-width: 210px;
 }
 
 .farm-popup strong {
@@ -66,23 +66,30 @@
   text-decoration: none;
 }
 
-.popup-status {
-  width: fit-content;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 900;
-  padding: 4px 8px;
-  text-transform: uppercase;
+.popup-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.popup-status.open {
-  background: var(--color-mint-100);
+.popup-badges .status-badge {
+  margin-left: 0;
+}
+
+.popup-distance {
   color: var(--color-leaf-700);
+  font-size: 0.78rem;
+  font-weight: 900;
 }
 
-.popup-status.closed {
-  background: #f7e5e8;
-  color: var(--color-berry);
+.popup-chip-list {
+  gap: 6px;
+}
+
+.popup-chip-list .berry-chip {
+  min-height: 24px;
+  font-size: 0.74rem;
+  padding-inline: 9px;
 }
 
 @media (max-width: 900px) {

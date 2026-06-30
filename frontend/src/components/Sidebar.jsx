@@ -7,6 +7,7 @@ export function Sidebar({
   filters,
   maxAvailablePrice,
   onFiltersChange,
+  onResetFilters,
   onSelectFarm,
   resultCount,
   selectedFarm,
@@ -24,11 +25,13 @@ export function Sidebar({
         filters={filters}
         maxAvailablePrice={maxAvailablePrice}
         onChange={onFiltersChange}
+        onReset={onResetFilters}
         resultCount={resultCount}
       />
 
       <FarmList
         farms={farms}
+        onResetFilters={onResetFilters}
         onSelectFarm={onSelectFarm}
         selectedFarm={selectedFarm}
       />

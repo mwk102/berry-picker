@@ -8,6 +8,9 @@ import {
   useMap,
 } from 'react-leaflet'
 import { farms as defaultFarms, redmondCenter } from '../data/farms'
+import { formatDistance } from '../utils/distance'
+import { BerryChip } from './BerryChip'
+import { StatusBadge } from './StatusBadge'
 import './FarmMap.css'
 
 const selectedFarmIcon = L.divIcon({
@@ -95,10 +98,17 @@ export function FarmMap({
             <Popup>
               <div className="farm-popup">
                 <strong>{farm.name}</strong>
-                <span>{farm.berryTypes.join(', ')}</span>
-                <span className={`popup-status ${farm.status.toLowerCase()}`}>
-                  {farm.status}
-                </span>
+                <div className="popup-badges">
+                  <StatusBadge status={farm.status} />
+                  <span className="popup-distance">
+                    {formatDistance(farm.distanceMiles)}
+                  </span>
+                </div>
+                <div className="berry-chip-list popup-chip-list">
+                  {farm.berryTypes.map((berryType) => (
+                    <BerryChip key={berryType}>{berryType}</BerryChip>
+                  ))}
+                </div>
                 <span>${farm.pricePerPound.toFixed(2)}/lb</span>
                 <span>{farm.city}</span>
                 <a href={farm.website} rel="noreferrer" target="_blank">

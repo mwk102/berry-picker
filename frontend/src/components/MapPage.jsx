@@ -4,6 +4,7 @@ import { usePageTitle } from '../hooks/usePageTitle'
 import { haversineDistanceMiles } from '../utils/distance'
 import { FarmMap } from './FarmMap'
 import { Sidebar } from './Sidebar'
+import { EmptyState } from './EmptyState'
 import './MapPage.css'
 
 const maxFarmPrice = Math.ceil(
@@ -62,6 +63,8 @@ export function MapPage() {
     [],
   )
   const [filters, setFilters] = useState(defaultFilters)
+  const [isLoading] = useState(false)
+  const [error] = useState(null)
   const [selectedFarm, setSelectedFarm] = useState(null)
 
   const berryTypes = useMemo(
@@ -109,6 +112,30 @@ export function MapPage() {
     }
   }, [filteredFarms, selectedFarm])
 
+  const resetFilters = () => setFilters(defaultFilters)
+
+  if (isLoading) {
+    return (
+      <div className="map-page-state">
+        <div className="loading-panel">
+          <span className="loading-spinner" aria-hidden="true" />
+          <strong>Loading farms</strong>
+          <p>Preparing the map and farm list.</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="map-page-state">
+        <EmptyState title="Unable to load farms">
+          The local farm data could not be prepared. Please refresh the page.
+        </EmptyState>
+      </div>
+    )
+  }
+
   return (
     <div className="map-page">
       <Sidebar
@@ -117,6 +144,7 @@ export function MapPage() {
         filters={filters}
         maxAvailablePrice={maxFarmPrice}
         onFiltersChange={setFilters}
+        onResetFilters={resetFilters}
         onSelectFarm={setSelectedFarm}
         resultCount={filteredFarms.length}
         selectedFarm={selectedFarm}
