@@ -1,0 +1,385 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  MEMBER
+  FARM_OWNER
+  MODERATOR
+  ADMIN
+}
+
+enum FarmStatus {
+  ACTIVE
+  TEMPORARILY_CLOSED
+  SEASONAL
+  PERMANENTLY_CLOSED
+  UNKNOWN
+}
+
+enum CropCategory {
+  BERRY
+  ORCHARD
+  FLOWER
+  VEGETABLE
+  PUMPKIN
+  CHRISTMAS_TREE
+  ATTRACTION
+  OTHER
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum DataSource {
+  ADMIN
+  FARM_OWNER
+  COMMUNITY
+  GOOGLE_PLACES
+  OPENSTREETMAP
+  FARM_WEBSITE
+  MANUAL_RESEARCH
+  IMPORT
+}
+
+enum PriceType {
+  PER_POUND
+  PER_BUCKET
+  PER_BOX
+  PER_PERSON
+  FLAT_ENTRY
+  DONATION
+  FREE
+  UNKNOWN
+}
+
+enum PickingCondition {
+  EXCELLENT
+  GOOD
+  LIMITED
+  PICKED_OVER
+  CLOSED
+  COMING_SOON
+  SEASON_OVER
+  UNKNOWN
+}
+
+enum CrowdLevel {
+  QUIET
+  MODERATE
+  BUSY
+  VERY_BUSY
+  UNKNOWN
+}
+
+enum ReportSource {
+  COMMUNITY
+  FARM_OWNER
+  ADMIN
+  IMPORT
+}
+
+enum AnnouncementType {
+  GENERAL
+  CLOSURE
+  PARKING
+  WEATHER
+  HARVEST
+  EVENT
+  WARNING
+}
+
+enum AmenityCategory {
+  FAMILY
+  ACCESSIBILITY
+  FACILITY
+  FOOD
+  ACTIVITY
+  POLICY
+  OTHER
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String?
+  email        String   @unique
+  passwordHash String?
+  role         UserRole @default(MEMBER)
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  pickingReports PickingReport[]
+  announcements  Announcement[]
+
+  @@index([role])
+}
+
+model Farm {
+  id             String     @id @default(uuid()) @db.Uuid
+  slug           String     @unique
+  name           String
+  description    String?
+  addressLine1   String?
+  addressLine2   String?
+  city           String
+  state          String
+  postalCode     String?
+  county         String?
+  country        String     @default("US")
+  latitude       Decimal    @db.Decimal(9, 6)
+  longitude      Decimal    @db.Decimal(9, 6)
+  timezone       String     @default("America/Los_Angeles")
+  phone          String?
+  email          String?
+  websiteUrl     String?
+  facebookUrl    String?
+  instagramUrl   String?
+  /// Public lifecycle/status shown or interpreted for visitors.
+  status         FarmStatus @default(UNKNOWN)
+  isVerified     Boolean    @default(false)
+  isClaimed      Boolean    @default(false)
+  /// Internal visibility flag for hiding records without deleting public/history data.
+  isActive       Boolean    @default(true)
+  dataSource     DataSource @default(MANUAL_RESEARCH)
+  lastVerifiedAt DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  farmCrops     FarmCrop[]
+  hours         FarmHour[]
+  specialHours  SpecialHour[]
+  amenities     FarmAmenity[]
+  cropPrices    CropPrice[]
+  reports       PickingReport[]
+  announcements Announcement[]
+
+  @@index([city])
+  @@index([state])
+  @@index([county])
+  @@index([latitude, longitude])
+  @@index([state, city])
+  @@index([isActive, status])
+}
+
+model Crop {
+  id                      String       @id @default(uuid()) @db.Uuid
+  slug                    String       @unique
+  name                    String
+  category                CropCategory
+  icon                    String?
+  color                   String?
+  defaultSeasonStartMonth Int?
+  defaultSeasonEndMonth   Int?
+  isActive                Boolean      @default(true)
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime     @updatedAt
+
+  farmCrops  FarmCrop[]
+  cropPrices CropPrice[]
+  reports    PickingReport[]
+
+  @@index([category])
+  @@index([isActive])
+}
+
+model FarmCrop {
+  id              String    @id @default(uuid()) @db.Uuid
+  farmId          String    @db.Uuid
+  cropId          String    @db.Uuid
+  seasonStartDate DateTime? @db.Date
+  seasonEndDate   DateTime? @db.Date
+  peakStartDate   DateTime? @db.Date
+  peakEndDate     DateTime? @db.Date
+  notes           String?
+  isUPick         Boolean   @default(true)
+  isPrePicked     Boolean   @default(false)
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  farm    Farm            @relation(fields: [farmId], references: [id], onDelete: Restrict)
+  crop    Crop            @relation(fields: [cropId], references: [id], onDelete: Restrict)
+  prices  CropPrice[]
+  reports PickingReport[]
+
+  @@unique([farmId, cropId])
+  @@index([farmId, isActive])
+  @@index([cropId, isActive])
+  @@index([seasonStartDate, seasonEndDate])
+}
+
+model FarmHour {
+  id                 String     @id @default(uuid()) @db.Uuid
+  farmId             String     @db.Uuid
+  dayOfWeek          DayOfWeek
+  openTime           DateTime?  @db.Time
+  closeTime          DateTime?  @db.Time
+  isClosed           Boolean    @default(false)
+  notes              String?
+  effectiveStartDate DateTime?  @db.Date
+  effectiveEndDate   DateTime?  @db.Date
+  source             DataSource @default(MANUAL_RESEARCH)
+  isVerified         Boolean    @default(false)
+  verifiedAt         DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Restrict)
+
+  @@index([farmId])
+  @@index([farmId, dayOfWeek])
+  @@index([effectiveStartDate, effectiveEndDate])
+}
+
+model SpecialHour {
+  id         String     @id @default(uuid()) @db.Uuid
+  farmId     String     @db.Uuid
+  date       DateTime   @db.Date
+  openTime   DateTime?  @db.Time
+  closeTime  DateTime?  @db.Time
+  isClosed   Boolean    @default(false)
+  reason     String?
+  source     DataSource @default(MANUAL_RESEARCH)
+  isVerified Boolean    @default(false)
+  verifiedAt DateTime?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Restrict)
+
+  @@index([farmId])
+  @@index([date])
+  @@index([farmId, date])
+}
+
+model Amenity {
+  id        String          @id @default(uuid()) @db.Uuid
+  slug      String          @unique
+  name      String
+  icon      String?
+  category  AmenityCategory
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  farms FarmAmenity[]
+
+  @@index([category])
+}
+
+model FarmAmenity {
+  id        String   @id @default(uuid()) @db.Uuid
+  farmId    String   @db.Uuid
+  amenityId String   @db.Uuid
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  farm    Farm    @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  amenity Amenity @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+
+  @@unique([farmId, amenityId])
+  @@index([farmId])
+  @@index([amenityId])
+}
+
+model CropPrice {
+  id                 String     @id @default(uuid()) @db.Uuid
+  /// Denormalized query helper. Must stay consistent with farmCropId in service logic.
+  farmId             String     @db.Uuid
+  farmCropId         String     @db.Uuid
+  /// Denormalized query helper. Must stay consistent with farmCropId in service logic.
+  cropId             String     @db.Uuid
+  priceType          PriceType
+  amount             Decimal?   @db.Decimal(10, 2)
+  currency           String     @default("USD")
+  unitLabel          String?
+  notes              String?
+  effectiveStartDate DateTime?  @db.Date
+  effectiveEndDate   DateTime?  @db.Date
+  source             DataSource @default(MANUAL_RESEARCH)
+  isVerified         Boolean    @default(false)
+  verifiedAt         DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  farm     Farm     @relation(fields: [farmId], references: [id], onDelete: Restrict)
+  farmCrop FarmCrop @relation(fields: [farmCropId], references: [id], onDelete: Restrict)
+  crop     Crop     @relation(fields: [cropId], references: [id], onDelete: Restrict)
+
+  @@index([farmId])
+  @@index([farmCropId])
+  @@index([cropId])
+  @@index([effectiveStartDate, effectiveEndDate])
+  @@index([farmCropId, effectiveStartDate, effectiveEndDate])
+}
+
+model PickingReport {
+  id         String           @id @default(uuid()) @db.Uuid
+  /// Denormalized query helper. Must stay consistent with farmCropId in service logic.
+  farmId     String           @db.Uuid
+  farmCropId String           @db.Uuid
+  /// Denormalized query helper. Must stay consistent with farmCropId in service logic.
+  cropId     String           @db.Uuid
+  userId     String?          @db.Uuid
+  condition  PickingCondition
+  crowdLevel CrowdLevel       @default(UNKNOWN)
+  rating     Int?
+  comment    String?
+  source     ReportSource     @default(COMMUNITY)
+  isVerified Boolean          @default(false)
+  isApproved Boolean          @default(false)
+  verifiedAt DateTime?
+  expiresAt  DateTime?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  farm     Farm     @relation(fields: [farmId], references: [id], onDelete: Restrict)
+  farmCrop FarmCrop @relation(fields: [farmCropId], references: [id], onDelete: Restrict)
+  crop     Crop     @relation(fields: [cropId], references: [id], onDelete: Restrict)
+  user     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([farmId])
+  @@index([cropId])
+  @@index([farmCropId])
+  @@index([createdAt])
+  @@index([expiresAt])
+  @@index([isApproved])
+  @@index([farmId, cropId, createdAt])
+  @@index([farmCropId, createdAt])
+  @@index([expiresAt, isApproved])
+}
+
+model Announcement {
+  id           String           @id @default(uuid()) @db.Uuid
+  farmId       String           @db.Uuid
+  authorUserId String?          @db.Uuid
+  title        String
+  body         String
+  type         AnnouncementType @default(GENERAL)
+  startsAt     DateTime?
+  endsAt       DateTime?
+  isPublished  Boolean          @default(false)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  farm   Farm  @relation(fields: [farmId], references: [id], onDelete: Restrict)
+  author User? @relation(fields: [authorUserId], references: [id], onDelete: SetNull)
+
+  @@index([farmId])
+  @@index([startsAt])
+  @@index([endsAt])
+  @@index([isPublished])
+  @@index([farmId, isPublished, startsAt, endsAt])
+}
