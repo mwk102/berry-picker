@@ -1,3 +1,5 @@
+import { formatDistance } from '../utils/distance'
+
 export function FarmCard({ farm, isSelected, onSelect }) {
   const berrySummary = farm.berryTypes.join(', ')
   const price = `$${farm.pricePerPound.toFixed(2)}/lb`
@@ -12,6 +14,9 @@ export function FarmCard({ farm, isSelected, onSelect }) {
       >
         <span className="farm-card-topline">
           <span className="farm-city">{farm.city}</span>
+          <span className="farm-distance">
+            {formatDistance(farm.distanceMiles)}
+          </span>
           <span className={`farm-status ${farm.status.toLowerCase()}`}>
             {farm.status}
           </span>

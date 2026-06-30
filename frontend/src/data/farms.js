@@ -137,4 +137,9 @@ export const farms = [
   },
 ]
 
-export const redmondCenter = [47.674, -122.1215]
+export const redmondOrigin = {
+  latitude: 47.674,
+  longitude: -122.1215,
+}
+
+export const redmondCenter = [redmondOrigin.latitude, redmondOrigin.longitude]

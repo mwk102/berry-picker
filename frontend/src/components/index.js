@@ -1,5 +1,6 @@
 export { AppLayout } from './AppLayout'
 export { FarmCard } from './FarmCard'
+export { Filters } from './Filters'
 export { FarmList } from './FarmList'
 export { FarmMap } from './FarmMap'
 export { Footer } from './Footer'

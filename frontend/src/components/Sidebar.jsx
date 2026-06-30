@@ -1,13 +1,31 @@
+import { Filters } from './Filters'
 import { FarmList } from './FarmList'
 
-export function Sidebar({ farms, selectedFarm, onSelectFarm }) {
+export function Sidebar({
+  berryTypes,
+  farms,
+  filters,
+  maxAvailablePrice,
+  onFiltersChange,
+  onSelectFarm,
+  resultCount,
+  selectedFarm,
+}) {
   return (
     <aside className="map-sidebar">
       <div className="sidebar-header">
         <span className="sidebar-kicker">Berry Picker</span>
         <h1>U-pick farms near Redmond</h1>
-        <p>{farms.length} local farms with seasonal berries and map details.</p>
+        <p>Search seasonal berry farms, compare prices, and stay close to Redmond.</p>
       </div>
+
+      <Filters
+        berryTypes={berryTypes}
+        filters={filters}
+        maxAvailablePrice={maxAvailablePrice}
+        onChange={onFiltersChange}
+        resultCount={resultCount}
+      />
 
       <FarmList
         farms={farms}
