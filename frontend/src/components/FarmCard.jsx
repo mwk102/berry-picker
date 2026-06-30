@@ -3,10 +3,16 @@ import { BerryChip } from './BerryChip'
 import { StatusBadge } from './StatusBadge'
 
 export function FarmCard({ farm, isSelected, onSelect }) {
-  const price = `$${farm.pricePerPound.toFixed(2)}/lb`
+  const cardClassName = [
+    'farm-card',
+    isSelected ? 'selected' : '',
+    farm.isUnverifiedCandidate ? 'unverified' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   return (
-    <article className={isSelected ? 'farm-card selected' : 'farm-card'}>
+    <article className={cardClassName}>
       <button
         aria-pressed={isSelected}
         className="farm-card-button"
@@ -21,10 +27,21 @@ export function FarmCard({ farm, isSelected, onSelect }) {
           <StatusBadge status={farm.status} />
         </span>
 
+        {/* TODO(admin-review): add approve/reject/edit/mark-verified controls here. */}
+        {farm.isUnverifiedCandidate ? (
+          <span className="candidate-review-block">
+            <span className="candidate-badge">Unverified candidate</span>
+            <span className="candidate-source">Source: {farm.sourceLabel}</span>
+            <span className="candidate-warning">
+              Needs review before public launch.
+            </span>
+          </span>
+        ) : null}
+
         <span className="farm-card-name">{farm.name}</span>
         <span className="farm-card-description">{farm.description}</span>
 
-        <span className="berry-chip-list" aria-label={`${farm.name} berry types`}>
+        <span className="berry-chip-list" aria-label={`${farm.name} crop types`}>
           {farm.berryTypes.map((berryType) => (
             <BerryChip key={berryType}>{berryType}</BerryChip>
           ))}
@@ -33,7 +50,7 @@ export function FarmCard({ farm, isSelected, onSelect }) {
         <span className="farm-meta-grid">
           <span>
             <strong>Price</strong>
-            {price}
+            {farm.priceLabel}
           </span>
           <span>
             <strong>Season</strong>

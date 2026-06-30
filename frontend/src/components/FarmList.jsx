@@ -1,7 +1,32 @@
 import { FarmCard } from './FarmCard'
 import { EmptyState } from './EmptyState'
 
-export function FarmList({ farms, onResetFilters, selectedFarm, onSelectFarm }) {
+function FarmListSkeleton() {
+  return (
+    <div className="farm-list" aria-label="Loading farms">
+      {Array.from({ length: 5 }).map((_, index) => (
+        <div className="farm-card-skeleton" key={index}>
+          <span />
+          <strong />
+          <p />
+          <div />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export function FarmList({
+  farms,
+  isLoading,
+  onResetFilters,
+  selectedFarm,
+  onSelectFarm,
+}) {
+  if (isLoading) {
+    return <FarmListSkeleton />
+  }
+
   if (farms.length === 0) {
     return (
       <EmptyState

@@ -7,7 +7,7 @@ import {
   TileLayer,
   useMap,
 } from 'react-leaflet'
-import { farms as defaultFarms, redmondCenter } from '../data/farms'
+import { redmondCenter } from '../lib/farmAdapter'
 import { formatDistance } from '../utils/distance'
 import { BerryChip } from './BerryChip'
 import { StatusBadge } from './StatusBadge'
@@ -15,6 +15,22 @@ import './FarmMap.css'
 
 const selectedFarmIcon = L.divIcon({
   className: 'farm-marker selected',
+  html: '<span aria-hidden="true"></span>',
+  iconSize: [30, 30],
+  iconAnchor: [15, 30],
+  popupAnchor: [0, -30],
+})
+
+const unverifiedFarmIcon = L.divIcon({
+  className: 'farm-marker unverified',
+  html: '<span aria-hidden="true"></span>',
+  iconSize: [30, 30],
+  iconAnchor: [15, 30],
+  popupAnchor: [0, -30],
+})
+
+const selectedUnverifiedFarmIcon = L.divIcon({
+  className: 'farm-marker unverified selected',
   html: '<span aria-hidden="true"></span>',
   iconSize: [30, 30],
   iconAnchor: [15, 30],
@@ -47,11 +63,17 @@ function FarmMapController({ markerRefs, selectedFarm, selectedPosition }) {
   return null
 }
 
-export function FarmMap({
-  farms = defaultFarms,
-  onSelectFarm,
-  selectedFarm,
-}) {
+function getFarmIcon(farm, selectedFarm) {
+  const isSelected = selectedFarm?.id === farm.id
+
+  if (farm.isUnverifiedCandidate) {
+    return isSelected ? selectedUnverifiedFarmIcon : unverifiedFarmIcon
+  }
+
+  return isSelected ? selectedFarmIcon : defaultFarmIcon
+}
+
+export function FarmMap({ farms = [], onSelectFarm, selectedFarm }) {
   const markerRefs = useRef({})
 
   const selectedPosition = useMemo(() => {
@@ -86,7 +108,7 @@ export function FarmMap({
             eventHandlers={{
               click: () => onSelectFarm?.(farm),
             }}
-            icon={selectedFarm?.id === farm.id ? selectedFarmIcon : defaultFarmIcon}
+            icon={getFarmIcon(farm, selectedFarm)}
             key={farm.id}
             position={[farm.latitude, farm.longitude]}
             ref={(marker) => {
@@ -96,8 +118,27 @@ export function FarmMap({
             }}
           >
             <Popup>
-              <div className="farm-popup">
+              <div
+                className={
+                  farm.isUnverifiedCandidate
+                    ? 'farm-popup unverified'
+                    : 'farm-popup'
+                }
+              >
                 <strong>{farm.name}</strong>
+                {farm.isUnverifiedCandidate ? (
+                  <>
+                    <span>{farm.city}</span>
+                    <span className="candidate-badge">Unverified candidate</span>
+                    <span className="candidate-source">
+                      Source: {farm.sourceLabel}
+                    </span>
+                    <span className="candidate-warning">
+                      Review needed before public launch.
+                    </span>
+                  </>
+                ) : (
+                  <>
                 <div className="popup-badges">
                   <StatusBadge status={farm.status} />
                   <span className="popup-distance">
@@ -109,11 +150,15 @@ export function FarmMap({
                     <BerryChip key={berryType}>{berryType}</BerryChip>
                   ))}
                 </div>
-                <span>${farm.pricePerPound.toFixed(2)}/lb</span>
+                <span>{farm.priceLabel}</span>
                 <span>{farm.city}</span>
-                <a href={farm.website} rel="noreferrer" target="_blank">
-                  Website
-                </a>
+                {farm.website ? (
+                  <a href={farm.website} rel="noreferrer" target="_blank">
+                    Website
+                  </a>
+                ) : null}
+                  </>
+                )}
               </div>
             </Popup>
           </Marker>

@@ -35,10 +35,25 @@ const farmInclude = {
     where: { isPublished: true },
     orderBy: [{ startsAt: 'desc' }, { createdAt: 'desc' }],
   },
+  sources: {
+    orderBy: { importedAt: 'desc' },
+  },
 }
 
 function buildFarmWhere(filters = {}) {
   const where = { isActive: true }
+  const andConditions = []
+
+  if (!filters.includeUnverified) {
+    where.reviewStatus = 'APPROVED'
+  } else {
+    andConditions.push({
+      OR: [
+        { reviewStatus: 'APPROVED' },
+        { isVerified: false, reviewStatus: 'PENDING_REVIEW' },
+      ],
+    })
+  }
 
   if (filters.city) {
     where.city = { equals: filters.city, mode: 'insensitive' }
@@ -61,21 +76,27 @@ function buildFarmWhere(filters = {}) {
   }
 
   if (filters.search) {
-    where.OR = [
-      { name: { contains: filters.search, mode: 'insensitive' } },
-      { description: { contains: filters.search, mode: 'insensitive' } },
-      { city: { contains: filters.search, mode: 'insensitive' } },
-      { county: { contains: filters.search, mode: 'insensitive' } },
-      {
-        farmCrops: {
-          some: {
-            crop: {
-              name: { contains: filters.search, mode: 'insensitive' },
+    andConditions.push({
+      OR: [
+        { name: { contains: filters.search, mode: 'insensitive' } },
+        { description: { contains: filters.search, mode: 'insensitive' } },
+        { city: { contains: filters.search, mode: 'insensitive' } },
+        { county: { contains: filters.search, mode: 'insensitive' } },
+        {
+          farmCrops: {
+            some: {
+              crop: {
+                name: { contains: filters.search, mode: 'insensitive' },
+              },
             },
           },
         },
-      },
-    ]
+      ],
+    })
+  }
+
+  if (andConditions.length > 0) {
+    where.AND = andConditions
   }
 
   return where
@@ -101,7 +122,7 @@ function createFarmRepository(prisma) {
 
     async findFarmBySlug(slug) {
       return prisma.farm.findFirst({
-        where: { slug, isActive: true },
+        where: { slug, isActive: true, reviewStatus: 'APPROVED' },
         include: farmInclude,
       })
     },

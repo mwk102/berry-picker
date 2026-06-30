@@ -5,6 +5,7 @@ export function Sidebar({
   berryTypes,
   farms,
   filters,
+  isLoading,
   maxAvailablePrice,
   onFiltersChange,
   onResetFilters,
@@ -17,7 +18,7 @@ export function Sidebar({
       <div className="sidebar-header">
         <span className="sidebar-kicker">Berry Picker</span>
         <h1>U-pick farms near Redmond</h1>
-        <p>Search seasonal berry farms, compare prices, and stay close to Redmond.</p>
+        <p>Search seasonal farms, compare prices, and stay close to Redmond.</p>
       </div>
 
       <Filters
@@ -31,6 +32,7 @@ export function Sidebar({
 
       <FarmList
         farms={farms}
+        isLoading={isLoading}
         onResetFilters={onResetFilters}
         onSelectFarm={onSelectFarm}
         selectedFarm={selectedFarm}

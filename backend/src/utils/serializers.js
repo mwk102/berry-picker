@@ -94,6 +94,7 @@ function serializeFarm(farm) {
     facebookUrl: farm.facebookUrl,
     instagramUrl: farm.instagramUrl,
     status: farm.status,
+    reviewStatus: farm.reviewStatus,
     isVerified: farm.isVerified,
     isClaimed: farm.isClaimed,
     isActive: farm.isActive,
@@ -117,6 +118,16 @@ function serializeFarm(farm) {
     prices: farm.cropPrices ? farm.cropPrices.map(serializePrice) : [],
     pickingReports: farm.reports ? farm.reports.map(serializePickingReport) : [],
     announcements: farm.announcements || [],
+    sources: farm.sources
+      ? farm.sources.map((source) => ({
+          id: source.id,
+          dataSource: source.dataSource,
+          externalId: source.externalId,
+          sourceUrl: source.sourceUrl,
+          importedAt: source.importedAt,
+          lastSeenAt: source.lastSeenAt,
+        }))
+      : [],
   }
 }
 

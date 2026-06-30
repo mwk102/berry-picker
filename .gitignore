@@ -1,3 +1,4 @@
 backend/.env
 backend/node_modules/.cache/
 backend/node_modules/
+backend/imports/candidate-sources/reports/*.json

@@ -110,6 +110,12 @@ enum AmenityCategory {
   OTHER
 }
 
+enum CandidateReviewStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
 model User {
   id           String   @id @default(uuid()) @db.Uuid
   name         String?
@@ -127,8 +133,8 @@ model User {
 }
 
 model Farm {
-  id             String     @id @default(uuid()) @db.Uuid
-  slug           String     @unique
+  id             String                @id @default(uuid()) @db.Uuid
+  slug           String                @unique
   name           String
   description    String?
   addressLine1   String?
@@ -137,25 +143,26 @@ model Farm {
   state          String
   postalCode     String?
   county         String?
-  country        String     @default("US")
-  latitude       Decimal    @db.Decimal(9, 6)
-  longitude      Decimal    @db.Decimal(9, 6)
-  timezone       String     @default("America/Los_Angeles")
+  country        String                @default("US")
+  latitude       Decimal               @db.Decimal(9, 6)
+  longitude      Decimal               @db.Decimal(9, 6)
+  timezone       String                @default("America/Los_Angeles")
   phone          String?
   email          String?
   websiteUrl     String?
   facebookUrl    String?
   instagramUrl   String?
   /// Public lifecycle/status shown or interpreted for visitors.
-  status         FarmStatus @default(UNKNOWN)
-  isVerified     Boolean    @default(false)
-  isClaimed      Boolean    @default(false)
+  status         FarmStatus            @default(UNKNOWN)
+  isVerified     Boolean               @default(false)
+  isClaimed      Boolean               @default(false)
   /// Internal visibility flag for hiding records without deleting public/history data.
-  isActive       Boolean    @default(true)
-  dataSource     DataSource @default(MANUAL_RESEARCH)
+  isActive       Boolean               @default(true)
+  dataSource     DataSource            @default(MANUAL_RESEARCH)
+  reviewStatus   CandidateReviewStatus @default(APPROVED)
   lastVerifiedAt DateTime?
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
 
   farmCrops     FarmCrop[]
   hours         FarmHour[]
@@ -164,6 +171,7 @@ model Farm {
   cropPrices    CropPrice[]
   reports       PickingReport[]
   announcements Announcement[]
+  sources       FarmSource[]
 
   @@index([city])
   @@index([state])
@@ -171,6 +179,25 @@ model Farm {
   @@index([latitude, longitude])
   @@index([state, city])
   @@index([isActive, status])
+  @@index([reviewStatus])
+}
+
+model FarmSource {
+  id          String     @id @default(uuid()) @db.Uuid
+  farmId      String     @db.Uuid
+  dataSource  DataSource
+  externalId  String?
+  sourceUrl   String?
+  rawMetadata Json?
+  importedAt  DateTime   @default(now())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@unique([dataSource, externalId])
+  @@index([farmId])
+  @@index([dataSource])
 }
 
 model Crop {

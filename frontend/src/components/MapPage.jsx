@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { farms, redmondOrigin } from '../data/farms'
+import { useCrops } from '../hooks/useCrops'
+import { useFarms } from '../hooks/useFarms'
+import { normalizeFarm, redmondOrigin } from '../lib/farmAdapter'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { haversineDistanceMiles } from '../utils/distance'
 import { FarmMap } from './FarmMap'
@@ -7,34 +9,14 @@ import { Sidebar } from './Sidebar'
 import { EmptyState } from './EmptyState'
 import './MapPage.css'
 
-const maxFarmPrice = Math.ceil(
-  Math.max(...farms.map((farm) => farm.pricePerPound)),
-)
-
 const defaultFilters = {
   search: '',
   berryType: 'all',
   openNow: false,
   radiusMiles: 50,
-  maxPricePerPound: maxFarmPrice,
+  maxPricePerPound: 10,
   sortBy: 'nearest',
-}
-
-function farmMatchesSearch(farm, searchTerm) {
-  if (!searchTerm) {
-    return true
-  }
-
-  const searchableText = [
-    farm.name,
-    farm.city,
-    farm.description,
-    farm.berryTypes.join(' '),
-  ]
-    .join(' ')
-    .toLowerCase()
-
-  return searchableText.includes(searchTerm.toLowerCase().trim())
+  showUnverifiedCandidates: false,
 }
 
 function sortFarms(farmsToSort, sortBy) {
@@ -54,44 +36,59 @@ function sortFarms(farmsToSort, sortBy) {
 export function MapPage() {
   usePageTitle('Map')
 
-  const farmsWithDistance = useMemo(
-    () =>
-      farms.map((farm) => ({
-        ...farm,
-        distanceMiles: haversineDistanceMiles(redmondOrigin, farm),
-      })),
-    [],
-  )
   const [filters, setFilters] = useState(defaultFilters)
-  const [isLoading] = useState(false)
-  const [error] = useState(null)
   const [selectedFarm, setSelectedFarm] = useState(null)
 
-  const berryTypes = useMemo(
-    () =>
-      [...new Set(farms.flatMap((farm) => farm.berryTypes))].sort((a, b) =>
-        a.localeCompare(b),
-      ),
-    [],
+  const farmQueryParams = useMemo(
+    () => ({
+      search: filters.search || undefined,
+      crop: filters.berryType === 'all' ? undefined : filters.berryType,
+      includeUnverified: filters.showUnverifiedCandidates || undefined,
+      limit: 100,
+      offset: 0,
+    }),
+    [filters.search, filters.berryType, filters.showUnverifiedCandidates],
   )
+
+  const farmsQuery = useFarms(farmQueryParams)
+  const cropsQuery = useCrops()
+
+  const farmsWithDistance = useMemo(
+    () =>
+      (farmsQuery.data?.data || []).map((farm) => {
+        const normalizedFarm = normalizeFarm(farm)
+        return {
+          ...normalizedFarm,
+          distanceMiles: haversineDistanceMiles(redmondOrigin, normalizedFarm),
+        }
+      }),
+    [farmsQuery.data],
+  )
+
+  const cropOptions = useMemo(
+    () =>
+      (cropsQuery.data?.data || []).map((crop) => ({
+        label: crop.name,
+        value: crop.slug,
+      })),
+    [cropsQuery.data],
+  )
+
+  const maxAvailablePrice = useMemo(() => {
+    const finitePrices = farmsWithDistance
+      .map((farm) => farm.pricePerPound)
+      .filter(Number.isFinite)
+
+    return Math.max(10, Math.ceil(Math.max(...finitePrices, 0)))
+  }, [farmsWithDistance])
 
   const filteredFarms = useMemo(() => {
     const visibleFarms = farmsWithDistance.filter((farm) => {
-      const matchesSearch = farmMatchesSearch(farm, filters.search)
-      const matchesBerry =
-        filters.berryType === 'all' ||
-        farm.berryTypes.includes(filters.berryType)
       const matchesOpenNow = !filters.openNow || farm.status === 'Open'
       const matchesRadius = farm.distanceMiles <= filters.radiusMiles
       const matchesPrice = farm.pricePerPound <= filters.maxPricePerPound
 
-      return (
-        matchesSearch &&
-        matchesBerry &&
-        matchesOpenNow &&
-        matchesRadius &&
-        matchesPrice
-      )
+      return matchesOpenNow && matchesRadius && matchesPrice
     })
 
     return sortFarms(visibleFarms, filters.sortBy)
@@ -113,24 +110,14 @@ export function MapPage() {
   }, [filteredFarms, selectedFarm])
 
   const resetFilters = () => setFilters(defaultFilters)
-
-  if (isLoading) {
-    return (
-      <div className="map-page-state">
-        <div className="loading-panel">
-          <span className="loading-spinner" aria-hidden="true" />
-          <strong>Loading farms</strong>
-          <p>Preparing the map and farm list.</p>
-        </div>
-      </div>
-    )
-  }
+  const isLoading = farmsQuery.isLoading || cropsQuery.isLoading
+  const error = farmsQuery.error || cropsQuery.error
 
   if (error) {
     return (
       <div className="map-page-state">
         <EmptyState title="Unable to load farms">
-          The local farm data could not be prepared. Please refresh the page.
+          {error.message || 'The API could not be reached. Make sure the backend server is running.'}
         </EmptyState>
       </div>
     )
@@ -139,10 +126,11 @@ export function MapPage() {
   return (
     <div className="map-page">
       <Sidebar
-        berryTypes={berryTypes}
+        berryTypes={cropOptions}
         farms={filteredFarms}
         filters={filters}
-        maxAvailablePrice={maxFarmPrice}
+        isLoading={isLoading}
+        maxAvailablePrice={maxAvailablePrice}
         onFiltersChange={setFilters}
         onResetFilters={resetFilters}
         onSelectFarm={setSelectedFarm}

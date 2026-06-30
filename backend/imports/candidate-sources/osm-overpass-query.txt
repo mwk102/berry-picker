@@ -1,0 +1,16 @@
+[out:json][timeout:45];
+(
+  node["shop"="farm"](47.45,-122.25,48.05,-121.80);
+  way["shop"="farm"](47.45,-122.25,48.05,-121.80);
+  relation["shop"="farm"](47.45,-122.25,48.05,-121.80);
+  node["landuse"="orchard"]["name"](47.45,-122.25,48.05,-121.80);
+  way["landuse"="orchard"]["name"](47.45,-122.25,48.05,-121.80);
+  relation["landuse"="orchard"]["name"](47.45,-122.25,48.05,-121.80);
+  node["produce"]["name"](47.45,-122.25,48.05,-121.80);
+  way["produce"]["name"](47.45,-122.25,48.05,-121.80);
+  relation["produce"]["name"](47.45,-122.25,48.05,-121.80);
+  node["name"~"berry|berries|orchard|pumpkin|u-pick|upick",i](47.45,-122.25,48.05,-121.80);
+  way["name"~"berry|berries|orchard|pumpkin|u-pick|upick",i](47.45,-122.25,48.05,-121.80);
+  relation["name"~"berry|berries|orchard|pumpkin|u-pick|upick",i](47.45,-122.25,48.05,-121.80);
+);
+out center tags;

@@ -1,0 +1,17 @@
+{
+  "queries": [
+    "u-pick farm near Redmond WA",
+    "u-pick berries near Woodinville WA",
+    "u-pick farm near Carnation WA",
+    "u-pick farm near Duvall WA",
+    "u-pick farm near Fall City WA",
+    "u-pick farm near Monroe WA",
+    "u-pick farm near Snohomish WA",
+    "u-pick farm near Issaquah WA"
+  ],
+  "locationBias": {
+    "latitude": 47.674,
+    "longitude": -122.1215,
+    "radiusMeters": 60000
+  }
+}

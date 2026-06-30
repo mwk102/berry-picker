@@ -42,6 +42,7 @@ function validateFarmListQuery(req, _res, next) {
       city: optionalText(req.query.city, 'city'),
       crop: optionalText(req.query.crop, 'crop'),
       verified: parseBoolean(req.query.verified, 'verified'),
+      includeUnverified: parseBoolean(req.query.includeUnverified, 'includeUnverified'),
       search: optionalText(req.query.search, 'search'),
       limit: parseLimit(req.query.limit),
       offset: parseNonNegativeInteger(req.query.offset, 'offset', 0),
@@ -59,6 +60,7 @@ function validateSearchQuery(req, _res, next) {
       city: optionalText(req.query.city, 'city'),
       crop: optionalText(req.query.crop, 'crop'),
       verified: parseBoolean(req.query.verified, 'verified'),
+      includeUnverified: parseBoolean(req.query.includeUnverified, 'includeUnverified'),
       limit: parseLimit(req.query.limit),
       offset: parseNonNegativeInteger(req.query.offset, 'offset', 0),
     }

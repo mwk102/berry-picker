@@ -43,6 +43,22 @@
   scale: 1.18;
 }
 
+.farm-marker.unverified span {
+  border-style: dashed;
+  background: #6b756e;
+  box-shadow: 0 10px 22px rgba(53, 61, 56, 0.24);
+  opacity: 0.86;
+}
+
+.farm-marker.unverified span::after {
+  background: #d8ded9;
+}
+
+.farm-marker.unverified.selected span {
+  background: #424a45;
+  opacity: 1;
+}
+
 .farm-popup {
   display: grid;
   gap: 8px;
@@ -52,6 +68,11 @@
 .farm-popup strong {
   color: var(--color-forest-900);
   font-size: 1rem;
+}
+
+.farm-popup.unverified {
+  border-left: 3px solid #6b756e;
+  padding-left: 10px;
 }
 
 .farm-popup span,
