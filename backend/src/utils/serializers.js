@@ -17,6 +17,8 @@ function serializePrice(price) {
     effectiveStartDate: price.effectiveStartDate,
     effectiveEndDate: price.effectiveEndDate,
     source: price.source,
+    sourceUrl: price.sourceUrl,
+    verificationMethod: price.verificationMethod,
     isVerified: price.isVerified,
     verifiedAt: price.verifiedAt,
     createdAt: price.createdAt,
@@ -58,6 +60,8 @@ function serializePickingReport(report) {
     rating: report.rating,
     comment: report.comment,
     source: report.source,
+    sourceUrl: report.sourceUrl,
+    verificationMethod: report.verificationMethod,
     isVerified: report.isVerified,
     isApproved: report.isApproved,
     verifiedAt: report.verifiedAt,
@@ -131,6 +135,27 @@ function serializeFarm(farm) {
           lastSeenAt: source.lastSeenAt,
         }))
       : [],
+    verificationProfile: farm.verification
+      ? {
+          id: farm.verification.id,
+          status: farm.verification.status,
+          lastResearchedAt: farm.verification.lastResearchedAt,
+          nextReviewAt: farm.verification.nextReviewAt,
+          confidence: farm.verification.confidence,
+          sourceCount: farm.verification.sourceCount,
+          sourceUrls: farm.verification.sourceUrls,
+          manualNotes: farm.verification.manualNotes,
+          completenessScore: farm.verification.completenessScore,
+          completeness: farm.verification.completenessJson,
+          lowConfidenceFields: farm.verification.lowConfidenceJson,
+          missingFields: farm.verification.missingFieldsJson,
+          personality: farm.verification.personalityJson,
+          heroImageUrl: farm.verification.heroImageUrl,
+          galleryImages: farm.verification.galleryImagesJson,
+          photoAttribution: farm.verification.photoAttribution,
+          updatedAt: farm.verification.updatedAt,
+        }
+      : null,
     candidateReview: farm.candidates?.[0]
       ? {
           id: farm.candidates[0].id,

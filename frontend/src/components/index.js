@@ -1,6 +1,7 @@
 export { AppLayout } from './AppLayout'
 export { BerryChip } from './BerryChip'
 export { Button } from './Button'
+export { CropIcon } from './CropIcon'
 export { EmptyState } from './EmptyState'
 export { FarmCard } from './FarmCard'
 export { Filters } from './Filters'

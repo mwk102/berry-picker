@@ -310,6 +310,7 @@
 .berry-chip {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   min-height: 28px;
   border: 1px solid rgba(47, 111, 70, 0.16);
   border-radius: var(--radius-pill);
@@ -318,6 +319,12 @@
   font-size: 0.78rem;
   font-weight: 800;
   padding: 0 var(--space-3);
+}
+
+.berry-chip-icon {
+  width: 1em;
+  height: 1em;
+  color: var(--color-berry);
 }
 
 .farm-meta-grid {

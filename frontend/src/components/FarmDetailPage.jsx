@@ -6,16 +6,21 @@ import { FarmConfidencePanel } from './FarmConfidencePanel'
 import { FarmCropStatusList } from './FarmCropStatusList'
 import { FarmHero } from './FarmHero'
 import { FarmHoursPanel } from './FarmHoursPanel'
+import { FarmPersonalityPanel } from './FarmPersonalityPanel'
 import { FarmPricePanel } from './FarmPricePanel'
 import { FarmReportsList } from './FarmReportsList'
 import { FarmStatusPanel } from './FarmStatusPanel'
-import { NearbyFarmsPlaceholder } from './NearbyFarmsPlaceholder'
+import { GoldStandardPanel } from './GoldStandardPanel'
+import { HarvestTimeline } from './HarvestTimeline'
+import { NearbyFarms } from './NearbyFarms'
+import { WhyVisitToday } from './WhyVisitToday'
 import {
   confidenceForFarm,
   getLatestReport,
   reportFreshnessDays,
   seasonStageForCrop,
-  worthTheDriveForFarm,
+  whyVisitToday,
+  worthTheDriveDetails,
 } from './FarmDetailUtils'
 import { useFarm } from '../hooks/useFarms'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -108,7 +113,8 @@ export function FarmDetailPage() {
   const cropStatuses = buildCropStatuses(farm)
   const confidence = confidenceForFarm(farm)
   const priceRows = buildPriceRows(farm)
-  const worthTheDriveScore = worthTheDriveForFarm(farm, cropStatuses)
+  const worthTheDrive = worthTheDriveDetails(farm, cropStatuses)
+  const whyVisit = whyVisitToday(farm, cropStatuses)
 
   return (
     <div className="farm-detail-page">
@@ -120,18 +126,22 @@ export function FarmDetailPage() {
         confidence={confidence}
         cropStatuses={cropStatuses}
         farm={farm}
-        worthTheDriveScore={worthTheDriveScore}
+        worthTheDrive={worthTheDrive}
       />
 
       <div className="farm-detail-grid">
+        <WhyVisitToday reason={whyVisit} />
         <FarmCropStatusList cropStatuses={cropStatuses} />
+        <HarvestTimeline cropStatuses={cropStatuses} />
+        <FarmPersonalityPanel personality={farm.verificationProfile?.personality} />
         <FarmConfidencePanel confidence={confidence} />
+        <GoldStandardPanel profile={farm.verificationProfile} />
         <FarmPricePanel prices={priceRows} />
         <FarmHoursPanel hours={farm.hours || []} specialHours={farm.specialHours || []} />
         <FarmAmenitiesGrid amenities={farm.amenities || []} />
         <FarmReportsList reports={farm.pickingReports || []} />
         <FarmAnnouncements announcements={farm.announcements || []} />
-        <NearbyFarmsPlaceholder />
+        <NearbyFarms farms={farm.nearbyFarms || []} />
       </div>
     </div>
   )

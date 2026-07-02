@@ -99,6 +99,11 @@
   font-weight: 950;
 }
 
+.crop-icon svg {
+  width: 1.55rem;
+  height: 1.55rem;
+}
+
 .crop-card-header h2,
 .weekend-outlook-placeholder h2 {
   color: var(--color-forest-950);

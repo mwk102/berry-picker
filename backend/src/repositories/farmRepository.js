@@ -45,6 +45,7 @@ function createFarmInclude(now = new Date()) {
   sources: {
     orderBy: { importedAt: 'desc' },
   },
+  verification: true,
   candidates: {
     orderBy: { updatedAt: 'desc' },
     take: 1,
@@ -136,6 +137,27 @@ function createFarmRepository(prisma) {
       return prisma.farm.findFirst({
         where: { slug, isActive: true, reviewStatus: 'APPROVED' },
         include: createFarmInclude(),
+      })
+    },
+
+    async findNearbyFarms(farm, limit = 4) {
+      return prisma.farm.findMany({
+        where: {
+          id: { not: farm.id },
+          isActive: true,
+          reviewStatus: 'APPROVED',
+          latitude: {
+            gte: Number(farm.latitude) - 0.5,
+            lte: Number(farm.latitude) + 0.5,
+          },
+          longitude: {
+            gte: Number(farm.longitude) - 0.5,
+            lte: Number(farm.longitude) + 0.5,
+          },
+        },
+        include: createFarmInclude(),
+        orderBy: [{ isVerified: 'desc' }, { name: 'asc' }],
+        take: limit * 3,
       })
     },
 

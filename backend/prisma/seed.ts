@@ -79,6 +79,7 @@ type FarmImport = {
   slug: string;
   name: string;
   description: string;
+  addressLine1?: string;
   city: string;
   state: string;
   postalCode: string;
@@ -89,8 +90,42 @@ type FarmImport = {
   timezone: string;
   phone: string;
   websiteUrl: string;
+  sourceUrl?: string;
+  sourceUrls?: string[];
+  lastVerifiedAt?: string;
+  nextReviewAt?: string;
+  verificationConfidence?: number;
+  manualNotes?: string;
+  heroImageUrl?: string;
+  galleryImages?: string[];
+  photoAttribution?: string;
+  personality?: {
+    bestFor: string[];
+    knownFor: string[];
+  };
+  isVerified?: boolean;
   cropSlugs: string[];
   amenitySlugs: string[];
+  fieldLocations?: Record<string, string>;
+  cropNotes?: Record<string, string>;
+  priceOverrides?: Record<string, { priceType: string; amount: string; unitLabel: string; notes?: string }>;
+  hours?: {
+    openDays: string[];
+    openTime: string;
+    closeTime: string;
+    closedDays: string[];
+    sourceUrl?: string;
+    notes: string;
+  };
+  currentReports?: Array<{
+    cropSlug: string;
+    condition: string;
+    crowdLevel: string;
+    rating: number;
+    sourceUrl?: string;
+    comment: string;
+  }>;
+  announcementSourceUrl?: string;
   announcement?: string;
 };
 
@@ -107,6 +142,7 @@ const summary = {
   reports: 0,
   announcements: 0,
   harvestSummaries: 0,
+  verificationProfiles: 0,
 };
 
 function date(value: string) {
@@ -115,6 +151,41 @@ function date(value: string) {
 
 function time(value: string) {
   return new Date(`1970-01-01T${value}:00.000Z`);
+}
+
+function buildCompleteness(farmImport: FarmImport) {
+  const checks = [
+    { key: "address", label: "Address", complete: Boolean(farmImport.addressLine1 && farmImport.city && farmImport.state) },
+    { key: "gps", label: "GPS", complete: Boolean(farmImport.latitude && farmImport.longitude) },
+    { key: "website", label: "Website", complete: Boolean(farmImport.websiteUrl) },
+    { key: "phone", label: "Phone", complete: Boolean(farmImport.phone) },
+    { key: "hours", label: "Hours", complete: Boolean(farmImport.hours) },
+    { key: "prices", label: "Prices", complete: Object.keys(farmImport.priceOverrides || {}).length > 0 },
+    { key: "amenities", label: "Amenities", complete: farmImport.amenitySlugs.length > 0 },
+    { key: "photos", label: "Photos", complete: Boolean(farmImport.heroImageUrl || farmImport.galleryImages?.length) },
+    { key: "reports", label: "Reports", complete: Boolean(farmImport.currentReports?.length) },
+  ];
+  const completeCount = checks.filter((check) => check.complete).length;
+
+  return {
+    score: Math.round((completeCount / checks.length) * 100),
+    checks,
+    missingFields: checks.filter((check) => !check.complete).map((check) => check.label),
+  };
+}
+
+function buildLowConfidenceFields(farmImport: FarmImport) {
+  const lowConfidenceFields = [];
+  if (!farmImport.heroImageUrl && !farmImport.galleryImages?.length) {
+    lowConfidenceFields.push("Photos");
+  }
+  if (farmImport.amenitySlugs.length > 0) {
+    lowConfidenceFields.push("Amenities need source-level verification");
+  }
+  if (farmImport.cropSlugs.includes("sunflower") && !farmImport.priceOverrides?.sunflower) {
+    lowConfidenceFields.push("Sunflower price");
+  }
+  return lowConfidenceFields;
 }
 
 async function seedCrops() {
@@ -140,6 +211,21 @@ async function seedAmenities() {
 }
 
 async function seedFarms() {
+  await prisma.farm.updateMany({
+    where: {
+      slug: {
+        in: [
+          "bear-creek-u-pick",
+          "harvold-s-strawberry-u-pick",
+          "harvold-s-raspberry-u-pick",
+          "harvolds-farm",
+          "harvold-farms",
+        ],
+      },
+    },
+    data: { isActive: false },
+  });
+
   for (const farm of washingtonFarms) {
     await prisma.farm.upsert({
       where: { slug: farm.slug },
@@ -147,6 +233,7 @@ async function seedFarms() {
         slug: farm.slug,
         name: farm.name,
         description: farm.description,
+        addressLine1: farm.addressLine1,
         city: farm.city,
         state: farm.state,
         postalCode: farm.postalCode,
@@ -158,14 +245,16 @@ async function seedFarms() {
         phone: farm.phone,
         websiteUrl: farm.websiteUrl,
         status: "ACTIVE",
-        dataSource: "MANUAL_RESEARCH",
-        isVerified: false,
+        dataSource: farm.isVerified ? "FARM_WEBSITE" : "MANUAL_RESEARCH",
+        isVerified: farm.isVerified ?? false,
         isClaimed: false,
         isActive: true,
+        lastVerifiedAt: farm.lastVerifiedAt ? new Date(farm.lastVerifiedAt) : null,
       },
       update: {
         name: farm.name,
         description: farm.description,
+        addressLine1: farm.addressLine1,
         city: farm.city,
         state: farm.state,
         postalCode: farm.postalCode,
@@ -177,12 +266,47 @@ async function seedFarms() {
         phone: farm.phone,
         websiteUrl: farm.websiteUrl,
         status: "ACTIVE",
-        dataSource: "MANUAL_RESEARCH",
-        isVerified: false,
+        dataSource: farm.isVerified ? "FARM_WEBSITE" : "MANUAL_RESEARCH",
+        isVerified: farm.isVerified ?? false,
         isClaimed: false,
         isActive: true,
+        lastVerifiedAt: farm.lastVerifiedAt ? new Date(farm.lastVerifiedAt) : null,
       },
     });
+
+    const sourceUrls = farm.sourceUrls || (farm.sourceUrl ? [farm.sourceUrl] : []);
+    if (sourceUrls.length > 0) {
+      const seededFarm = await prisma.farm.findUniqueOrThrow({ where: { slug: farm.slug } });
+      for (const sourceUrl of sourceUrls) {
+        await prisma.farmSource.upsert({
+          where: {
+            dataSource_externalId: {
+              dataSource: "FARM_WEBSITE",
+              externalId: sourceUrl,
+            },
+          },
+          create: {
+            farmId: seededFarm.id,
+            dataSource: "FARM_WEBSITE",
+            externalId: sourceUrl,
+            sourceUrl,
+            rawMetadata: {
+              verificationConfidence: farm.verificationConfidence,
+              lastCheckedAt: farm.lastVerifiedAt,
+            },
+          },
+          update: {
+            farmId: seededFarm.id,
+            sourceUrl,
+            rawMetadata: {
+              verificationConfidence: farm.verificationConfidence,
+              lastCheckedAt: farm.lastVerifiedAt,
+            },
+            importedAt: new Date(),
+          },
+        });
+      }
+    }
     summary.farms += 1;
   }
 }
@@ -191,21 +315,30 @@ async function seedFarmHours() {
   const farms = await prisma.farm.findMany({ where: { slug: { in: washingtonFarms.map((farm) => farm.slug) } } });
 
   for (const farm of farms) {
+    const farmImport = washingtonFarms.find((candidate) => candidate.slug === farm.slug);
+    const hourOverride = farmImport?.hours;
     await prisma.farmHour.deleteMany({ where: { farmId: farm.id } });
     for (const dayOfWeek of dayNames) {
-      const isClosed = dayOfWeek === "MONDAY";
+      const isClosed = hourOverride ? hourOverride.closedDays.includes(dayOfWeek) : dayOfWeek === "MONDAY";
       await prisma.farmHour.create({
         data: {
           farmId: farm.id,
           dayOfWeek,
-          openTime: isClosed ? null : time("09:00"),
-          closeTime: isClosed ? null : time("17:00"),
+          openTime: isClosed ? null : time(hourOverride?.openTime || "09:00"),
+          closeTime: isClosed ? null : time(hourOverride?.closeTime || "17:00"),
           isClosed,
-          notes: isClosed ? "Closed for field recovery and maintenance." : "Development hours; confirm with farm before visiting.",
+          notes: hourOverride
+            ? hourOverride.notes
+            : isClosed
+              ? "Closed for field recovery and maintenance."
+              : "Development hours; confirm with farm before visiting.",
           effectiveStartDate: date("2026-06-01"),
           effectiveEndDate: date("2026-10-31"),
-          source: "MANUAL_RESEARCH",
-          isVerified: false,
+          source: farmImport?.isVerified ? "FARM_WEBSITE" : "MANUAL_RESEARCH",
+          sourceUrl: hourOverride?.sourceUrl || farmImport?.sourceUrl,
+          verificationMethod: farmImport?.isVerified ? "manual_official_website_review" : "development_seed",
+          isVerified: farmImport?.isVerified ?? false,
+          verifiedAt: farmImport?.lastVerifiedAt ? new Date(farmImport.lastVerifiedAt) : null,
         },
       });
     }
@@ -229,7 +362,7 @@ async function seedFarmCrops() {
           seasonEndDate: date(season.end),
           peakStartDate: date(season.peakStart),
           peakEndDate: date(season.peakEnd),
-          notes: "Development seasonal window. Not verified against live farm conditions.",
+          notes: farmImport.cropNotes?.[cropSlug] || "Development seasonal window. Not verified against live farm conditions.",
           isUPick: true,
           isPrePicked: cropSlug === "pumpkin" || cropSlug === "christmas-tree",
           isActive: true,
@@ -239,7 +372,7 @@ async function seedFarmCrops() {
           seasonEndDate: date(season.end),
           peakStartDate: date(season.peakStart),
           peakEndDate: date(season.peakEnd),
-          notes: "Development seasonal window. Not verified against live farm conditions.",
+          notes: farmImport.cropNotes?.[cropSlug] || "Development seasonal window. Not verified against live farm conditions.",
           isUPick: true,
           isPrePicked: cropSlug === "pumpkin" || cropSlug === "christmas-tree",
           isActive: true,
@@ -262,13 +395,14 @@ async function seedFarmCrops() {
 async function seedCropPrices() {
   const farmCrops = await prisma.farmCrop.findMany({
     where: { farm: { slug: { in: washingtonFarms.map((farm) => farm.slug) } } },
-    include: { crop: true },
+    include: { crop: true, farm: true },
   });
 
   await prisma.cropPrice.deleteMany({ where: { farmCropId: { in: farmCrops.map((farmCrop) => farmCrop.id) } } });
 
   for (const farmCrop of farmCrops) {
-    const price = priceByCrop[farmCrop.crop.slug];
+    const farmImport = washingtonFarms.find((candidate) => candidate.slug === farmCrop.farm.slug);
+    const price = farmImport?.priceOverrides?.[farmCrop.crop.slug] || priceByCrop[farmCrop.crop.slug];
     await prisma.cropPrice.create({
       data: {
         farmId: farmCrop.farmId,
@@ -278,11 +412,16 @@ async function seedCropPrices() {
         amount: price.amount,
         currency: "USD",
         unitLabel: price.unitLabel,
-        notes: "Development price data. Confirm with farm before visiting.",
+        notes: price.notes || "Development price data. Confirm with farm before visiting.",
         effectiveStartDate: farmCrop.seasonStartDate,
         effectiveEndDate: farmCrop.seasonEndDate,
-        source: "MANUAL_RESEARCH",
-        isVerified: false,
+        source: farmImport?.priceOverrides?.[farmCrop.crop.slug] ? "FARM_WEBSITE" : "MANUAL_RESEARCH",
+        sourceUrl: farmImport?.priceOverrides?.[farmCrop.crop.slug] ? farmImport.sourceUrl : undefined,
+        verificationMethod: farmImport?.priceOverrides?.[farmCrop.crop.slug]
+          ? "manual_official_website_review"
+          : "development_seed",
+        isVerified: Boolean(farmImport?.priceOverrides?.[farmCrop.crop.slug]),
+        verifiedAt: farmImport?.lastVerifiedAt ? new Date(farmImport.lastVerifiedAt) : null,
       },
     });
     summary.prices += 1;
@@ -298,25 +437,45 @@ async function seedPickingReports() {
   await prisma.pickingReport.deleteMany({ where: { farmId: { in: farms.map((farm) => farm.id) }, source: "ADMIN" } });
 
   for (const farm of farms) {
-    const farmCrop = farm.farmCrops[0];
-    if (!farmCrop) continue;
+    const farmImport = washingtonFarms.find((candidate) => candidate.slug === farm.slug);
+    const reportInputs =
+      farmImport?.currentReports ||
+      (farm.farmCrops[0]
+        ? [
+            {
+              cropSlug: farm.farmCrops[0].crop.slug,
+              condition: "GOOD",
+              crowdLevel: "MODERATE",
+              rating: 4,
+              comment: `${farm.farmCrops[0].crop.name} looks promising in this development seed record. Confirm before visiting.`,
+            },
+          ]
+        : []);
 
-    await prisma.pickingReport.create({
-      data: {
-        farmId: farm.id,
-        farmCropId: farmCrop.id,
-        cropId: farmCrop.cropId,
-        condition: "GOOD",
-        crowdLevel: "MODERATE",
-        rating: 4,
-        comment: `${farmCrop.crop.name} looks promising in this development seed record. Confirm before visiting.`,
-        source: "ADMIN",
-        isVerified: false,
-        isApproved: true,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 72),
-      },
-    });
-    summary.reports += 1;
+    for (const reportInput of reportInputs) {
+      const farmCrop = farm.farmCrops.find((candidate) => candidate.crop.slug === reportInput.cropSlug);
+      if (!farmCrop) continue;
+
+      await prisma.pickingReport.create({
+        data: {
+          farmId: farm.id,
+          farmCropId: farmCrop.id,
+          cropId: farmCrop.cropId,
+          condition: reportInput.condition,
+          crowdLevel: reportInput.crowdLevel,
+          rating: reportInput.rating,
+          comment: reportInput.comment,
+          source: "ADMIN",
+          sourceUrl: reportInput.sourceUrl || farmImport?.sourceUrl,
+          verificationMethod: farmImport?.isVerified ? "manual_official_website_review" : "development_seed",
+          isVerified: farmImport?.isVerified ?? false,
+          isApproved: true,
+          verifiedAt: farmImport?.lastVerifiedAt ? new Date(farmImport.lastVerifiedAt) : null,
+          expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 72),
+        },
+      });
+      summary.reports += 1;
+    }
   }
 }
 
@@ -339,9 +498,65 @@ async function seedAnnouncements() {
         startsAt: new Date(),
         endsAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
         isPublished: true,
+        source: farmImport.isVerified ? "FARM_WEBSITE" : "MANUAL_RESEARCH",
+        sourceUrl: farmImport.announcementSourceUrl || farmImport.sourceUrl,
+        verificationMethod: farmImport.isVerified ? "manual_official_website_review" : "development_seed",
+        isVerified: farmImport.isVerified ?? false,
+        verifiedAt: farmImport.lastVerifiedAt ? new Date(farmImport.lastVerifiedAt) : null,
       },
     });
     summary.announcements += 1;
+  }
+}
+
+async function seedVerificationProfiles() {
+  for (const farmImport of washingtonFarms) {
+    if (!farmImport.isVerified && !farmImport.verificationConfidence) continue;
+
+    const farm = await prisma.farm.findUniqueOrThrow({ where: { slug: farmImport.slug } });
+    const completeness = buildCompleteness(farmImport);
+    const lowConfidenceFields = buildLowConfidenceFields(farmImport);
+    const sourceUrls = farmImport.sourceUrls || (farmImport.sourceUrl ? [farmImport.sourceUrl] : []);
+
+    await prisma.farmVerificationProfile.upsert({
+      where: { farmId: farm.id },
+      create: {
+        farmId: farm.id,
+        status: farmImport.isVerified ? "GOLD_STANDARD" : "PENDING_REVIEW",
+        lastResearchedAt: farmImport.lastVerifiedAt ? new Date(farmImport.lastVerifiedAt) : null,
+        nextReviewAt: farmImport.nextReviewAt ? new Date(farmImport.nextReviewAt) : null,
+        confidence: farmImport.verificationConfidence || 0,
+        sourceCount: sourceUrls.length,
+        sourceUrls,
+        manualNotes: farmImport.manualNotes,
+        completenessScore: completeness.score,
+        completenessJson: completeness.checks,
+        missingFieldsJson: completeness.missingFields,
+        lowConfidenceJson: lowConfidenceFields,
+        personalityJson: farmImport.personality || null,
+        heroImageUrl: farmImport.heroImageUrl || null,
+        galleryImagesJson: farmImport.galleryImages || [],
+        photoAttribution: farmImport.photoAttribution,
+      },
+      update: {
+        status: farmImport.isVerified ? "GOLD_STANDARD" : "PENDING_REVIEW",
+        lastResearchedAt: farmImport.lastVerifiedAt ? new Date(farmImport.lastVerifiedAt) : null,
+        nextReviewAt: farmImport.nextReviewAt ? new Date(farmImport.nextReviewAt) : null,
+        confidence: farmImport.verificationConfidence || 0,
+        sourceCount: sourceUrls.length,
+        sourceUrls,
+        manualNotes: farmImport.manualNotes,
+        completenessScore: completeness.score,
+        completenessJson: completeness.checks,
+        missingFieldsJson: completeness.missingFields,
+        lowConfidenceJson: lowConfidenceFields,
+        personalityJson: farmImport.personality || null,
+        heroImageUrl: farmImport.heroImageUrl || null,
+        galleryImagesJson: farmImport.galleryImages || [],
+        photoAttribution: farmImport.photoAttribution,
+      },
+    });
+    summary.verificationProfiles += 1;
   }
 }
 
@@ -361,6 +576,7 @@ async function main() {
   await seedCropPrices();
   await seedPickingReports();
   await seedAnnouncements();
+  await seedVerificationProfiles();
   await seedHarvestSummaries();
 
   console.log("Northwest U-Pick seed summary");
@@ -372,6 +588,7 @@ async function main() {
     "prices created/updated": summary.prices,
     "reports created/updated": summary.reports,
     "announcements created/updated": summary.announcements,
+    "verification profiles created/updated": summary.verificationProfiles,
     "harvest summaries recalculated": summary.harvestSummaries,
   });
 }

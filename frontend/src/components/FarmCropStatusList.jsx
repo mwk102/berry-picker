@@ -5,7 +5,7 @@ import { formatDate, formatPrice, getLatestPrice, getLatestReport, reportFreshne
 function reportText(report) {
   if (!report) return 'No recent report'
   const freshness = reportFreshnessDays(report)
-  return `${report.condition}${freshness === null ? '' : ` · ${freshness}d old`}`
+  return `${report.condition}${freshness === null ? '' : ` - ${freshness}d old`}`
 }
 
 export function FarmCropStatusList({ cropStatuses }) {
@@ -22,8 +22,8 @@ export function FarmCropStatusList({ cropStatuses }) {
 
           return (
             <article className="farm-crop-status" key={farmCrop.id}>
-              <div>
-                <BerryChip>{farmCrop.name}</BerryChip>
+              <div className="farm-crop-status-main">
+                <BerryChip crop={farmCrop.crop}>{farmCrop.name}</BerryChip>
                 <strong>{farmCrop.name}</strong>
                 <span>
                   {formatDate(farmCrop.seasonStartDate)} - {formatDate(farmCrop.seasonEndDate)}

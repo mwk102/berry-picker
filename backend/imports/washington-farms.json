@@ -35,21 +35,82 @@
     "amenitySlugs": ["parking", "kid-friendly", "picnic-area"]
   },
   {
-    "slug": "bear-creek-u-pick",
-    "name": "Bear Creek U-Pick",
-    "description": "Development record for a compact neighborhood farm focused on early berries and short picking windows.",
-    "city": "Redmond",
+    "slug": "harvold-berry-farm",
+    "name": "Harvold Berry Farm and Veggies",
+    "description": "Family-friendly U-pick farm in Carnation, WA since 1948, with separate strawberry and raspberry/sunflower/vegetable field locations.",
+    "addressLine1": "5207 Carnation-Duvall Rd NE",
+    "city": "Carnation",
     "state": "WA",
-    "postalCode": "98052",
+    "postalCode": "98014",
     "county": "King",
     "country": "US",
-    "latitude": 47.6857,
-    "longitude": -122.0996,
+    "latitude": 47.6532,
+    "longitude": -121.91309,
     "timezone": "America/Los_Angeles",
-    "phone": "(425) 555-0103",
-    "websiteUrl": "https://example.com/bear-creek-u-pick",
-    "cropSlugs": ["strawberry", "raspberry"],
-    "amenitySlugs": ["parking", "restrooms", "kid-friendly"]
+    "phone": "425-298-5125",
+    "websiteUrl": "https://harvoldberryfarm.com/",
+      "sourceUrl": "https://harvoldberryfarm.com/location-%26-price",
+      "lastVerifiedAt": "2026-07-02T00:00:00.000Z",
+      "verificationConfidence": 95,
+      "nextReviewAt": "2026-07-09T00:00:00.000Z",
+      "sourceUrls": [
+        "https://harvoldberryfarm.com/",
+        "https://harvoldberryfarm.com/location-%26-price",
+        "https://harvoldberryfarm.com/contact-us"
+      ],
+      "manualNotes": "Gold Standard reference farm. Official website confirms farm name, Carnation location, phone, current berry updates, hours, field addresses, and strawberry/raspberry prices. Field availability can change when picked out.",
+      "heroImageUrl": "",
+      "galleryImages": [],
+      "photoAttribution": "Photo placeholder until real farm photos are licensed or owner-provided.",
+      "personality": {
+        "bestFor": ["Family Friendly", "Quick Berry Trip", "Photography", "Young Children"],
+        "knownFor": ["Fresh Strawberries", "Raspberries", "Sunflowers"]
+      },
+      "isVerified": true,
+    "cropSlugs": ["strawberry", "raspberry", "sunflower"],
+    "amenitySlugs": ["parking", "kid-friendly", "farm-store"],
+    "fieldLocations": {
+      "strawberry": "7701 Carnation Duvall Rd NE, Carnation, WA 98014",
+      "raspberry": "5207 Carnation-Duvall Rd NE, Carnation, WA 98014",
+      "sunflower": "5207 Carnation-Duvall Rd NE, Carnation, WA 98014"
+    },
+    "cropNotes": {
+      "strawberry": "Official site lists strawberry field at 7701 Carnation Duvall Rd NE. Look for big yellow signs.",
+      "raspberry": "Official site lists raspberry field at 5207 Carnation-Duvall Rd NE. Five-pound minimum noted for raspberry season.",
+      "sunflower": "Official site lists sunflower and veggie fields at 5207 Carnation-Duvall Rd NE."
+    },
+    "priceOverrides": {
+      "strawberry": { "priceType": "PER_POUND", "amount": "4.00", "unitLabel": "lb", "notes": "Official Location & Price page lists strawberry season at $4/lb." },
+      "raspberry": { "priceType": "PER_POUND", "amount": "4.75", "unitLabel": "lb", "notes": "Official Location & Price page lists raspberry season at $4.75/lb with a five-pound minimum." }
+    },
+      "hours": {
+        "openDays": ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"],
+        "openTime": "08:00",
+        "closeTime": "18:00",
+        "closedDays": ["SUNDAY"],
+        "sourceUrl": "https://harvoldberryfarm.com/",
+        "notes": "Official homepage lists Monday through Saturday 8am to 6pm, or until picked out; closed Sundays."
+      },
+    "currentReports": [
+      {
+        "cropSlug": "strawberry",
+          "condition": "GOOD",
+          "crowdLevel": "UNKNOWN",
+          "rating": 4,
+          "sourceUrl": "https://harvoldberryfarm.com/",
+          "comment": "Official homepage update: strawberry field at 7701 Carnation Duvall Rd NE; open during posted berry hours unless picked out."
+        },
+      {
+        "cropSlug": "raspberry",
+          "condition": "LIMITED",
+          "crowdLevel": "UNKNOWN",
+          "rating": 3,
+          "sourceUrl": "https://harvoldberryfarm.com/",
+          "comment": "Official homepage update noted raspberry picking at 5207 Carnation Duvall Rd NE and a next-picking update around July 1."
+        }
+      ],
+      "announcementSourceUrl": "https://harvoldberryfarm.com/",
+      "announcement": "Verified from official Harvold Berry Farm website. Check the farm website before visiting because berry fields may close when picked out."
   },
   {
     "slug": "sammamish-valley-fields",

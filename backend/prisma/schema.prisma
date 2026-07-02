@@ -132,6 +132,14 @@ enum HarvestSeasonStage {
   ENDED
 }
 
+enum FarmVerificationStatus {
+  UNVERIFIED
+  PENDING_REVIEW
+  VERIFIED
+  GOLD_STANDARD
+  NEEDS_REVIEW
+}
+
 model User {
   id           String   @id @default(uuid()) @db.Uuid
   name         String?
@@ -189,6 +197,7 @@ model Farm {
   announcements Announcement[]
   sources       FarmSource[]
   candidates    CandidateFarm[]
+  verification  FarmVerificationProfile?
 
   @@index([city])
   @@index([state])
@@ -197,6 +206,35 @@ model Farm {
   @@index([state, city])
   @@index([isActive, status])
   @@index([reviewStatus])
+}
+
+model FarmVerificationProfile {
+  id                String                 @id @default(uuid()) @db.Uuid
+  farmId            String                 @unique @db.Uuid
+  status            FarmVerificationStatus @default(PENDING_REVIEW)
+  lastResearchedAt  DateTime?
+  nextReviewAt      DateTime?
+  confidence        Int                    @default(0)
+  sourceCount       Int                    @default(0)
+  sourceUrls        Json
+  manualNotes       String?
+  completenessScore Int                    @default(0)
+  completenessJson  Json?
+  lowConfidenceJson Json?
+  missingFieldsJson Json?
+  personalityJson   Json?
+  heroImageUrl      String?
+  galleryImagesJson Json?
+  photoAttribution  String?
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Restrict)
+
+  @@index([status])
+  @@index([lastResearchedAt])
+  @@index([nextReviewAt])
+  @@index([completenessScore])
 }
 
 model FarmSource {
@@ -327,6 +365,8 @@ model FarmHour {
   effectiveStartDate DateTime?  @db.Date
   effectiveEndDate   DateTime?  @db.Date
   source             DataSource @default(MANUAL_RESEARCH)
+  sourceUrl          String?
+  verificationMethod String?
   isVerified         Boolean    @default(false)
   verifiedAt         DateTime?
   createdAt          DateTime   @default(now())
@@ -340,18 +380,20 @@ model FarmHour {
 }
 
 model SpecialHour {
-  id         String     @id @default(uuid()) @db.Uuid
-  farmId     String     @db.Uuid
-  date       DateTime   @db.Date
-  openTime   DateTime?  @db.Time
-  closeTime  DateTime?  @db.Time
-  isClosed   Boolean    @default(false)
-  reason     String?
-  source     DataSource @default(MANUAL_RESEARCH)
-  isVerified Boolean    @default(false)
-  verifiedAt DateTime?
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  id                 String     @id @default(uuid()) @db.Uuid
+  farmId             String     @db.Uuid
+  date               DateTime   @db.Date
+  openTime           DateTime?  @db.Time
+  closeTime          DateTime?  @db.Time
+  isClosed           Boolean    @default(false)
+  reason             String?
+  source             DataSource @default(MANUAL_RESEARCH)
+  sourceUrl          String?
+  verificationMethod String?
+  isVerified         Boolean    @default(false)
+  verifiedAt         DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
 
   farm Farm @relation(fields: [farmId], references: [id], onDelete: Restrict)
 
@@ -405,6 +447,8 @@ model CropPrice {
   effectiveStartDate DateTime?  @db.Date
   effectiveEndDate   DateTime?  @db.Date
   source             DataSource @default(MANUAL_RESEARCH)
+  sourceUrl          String?
+  verificationMethod String?
   isVerified         Boolean    @default(false)
   verifiedAt         DateTime?
   createdAt          DateTime   @default(now())
@@ -422,24 +466,26 @@ model CropPrice {
 }
 
 model PickingReport {
-  id         String           @id @default(uuid()) @db.Uuid
+  id                 String           @id @default(uuid()) @db.Uuid
   /// Denormalized query helper. Must stay consistent with farmCropId in service logic.
-  farmId     String           @db.Uuid
-  farmCropId String           @db.Uuid
+  farmId             String           @db.Uuid
+  farmCropId         String           @db.Uuid
   /// Denormalized query helper. Must stay consistent with farmCropId in service logic.
-  cropId     String           @db.Uuid
-  userId     String?          @db.Uuid
-  condition  PickingCondition
-  crowdLevel CrowdLevel       @default(UNKNOWN)
-  rating     Int?
-  comment    String?
-  source     ReportSource     @default(COMMUNITY)
-  isVerified Boolean          @default(false)
-  isApproved Boolean          @default(false)
-  verifiedAt DateTime?
-  expiresAt  DateTime?
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
+  cropId             String           @db.Uuid
+  userId             String?          @db.Uuid
+  condition          PickingCondition
+  crowdLevel         CrowdLevel       @default(UNKNOWN)
+  rating             Int?
+  comment            String?
+  source             ReportSource     @default(COMMUNITY)
+  sourceUrl          String?
+  verificationMethod String?
+  isVerified         Boolean          @default(false)
+  isApproved         Boolean          @default(false)
+  verifiedAt         DateTime?
+  expiresAt          DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 
   farm     Farm     @relation(fields: [farmId], references: [id], onDelete: Restrict)
   farmCrop FarmCrop @relation(fields: [farmCropId], references: [id], onDelete: Restrict)
@@ -458,17 +504,22 @@ model PickingReport {
 }
 
 model Announcement {
-  id           String           @id @default(uuid()) @db.Uuid
-  farmId       String           @db.Uuid
-  authorUserId String?          @db.Uuid
-  title        String
-  body         String
-  type         AnnouncementType @default(GENERAL)
-  startsAt     DateTime?
-  endsAt       DateTime?
-  isPublished  Boolean          @default(false)
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
+  id                 String           @id @default(uuid()) @db.Uuid
+  farmId             String           @db.Uuid
+  authorUserId       String?          @db.Uuid
+  title              String
+  body               String
+  type               AnnouncementType @default(GENERAL)
+  startsAt           DateTime?
+  endsAt             DateTime?
+  isPublished        Boolean          @default(false)
+  source             DataSource       @default(MANUAL_RESEARCH)
+  sourceUrl          String?
+  verificationMethod String?
+  isVerified         Boolean          @default(false)
+  verifiedAt         DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 
   farm   Farm  @relation(fields: [farmId], references: [id], onDelete: Restrict)
   author User? @relation(fields: [authorUserId], references: [id], onDelete: SetNull)

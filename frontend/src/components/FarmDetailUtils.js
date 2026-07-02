@@ -104,3 +104,56 @@ export function worthTheDriveForFarm(farm, cropStatuses) {
   const reportBoost = confidence.recentReportCount > 0 ? 15 : 0
   return Math.min(100, openBoost + cropBoost + peakBoost + reportBoost + Math.round(confidence.score * 0.15))
 }
+
+export function worthTheDriveDetails(farm, cropStatuses) {
+  const confidence = confidenceForFarm(farm)
+  const reasons = []
+
+  if (confidence.freshness !== null && confidence.freshness <= 3) {
+    reasons.push('Fresh official update')
+  }
+  if (cropStatuses.some((crop) => crop.stage === 'PEAK')) {
+    reasons.push(`Peak ${cropStatuses.find((crop) => crop.stage === 'PEAK')?.name} season`)
+  }
+  if (confidence.score >= 85 || farm.verificationProfile?.confidence >= 90) {
+    reasons.push('Excellent confidence')
+  }
+  if ((farm.amenities || []).some((amenity) => amenity.slug === 'kid-friendly')) {
+    reasons.push('Family friendly')
+  }
+  if ((farm.prices || []).some((price) => price.isVerified && typeof price.amount === 'number')) {
+    reasons.push('Verified pricing')
+  }
+
+  return {
+    score: worthTheDriveForFarm(farm, cropStatuses),
+    reasons: reasons.length > 0 ? reasons : ['More verification needed before recommending a long drive'],
+  }
+}
+
+export function whyVisitToday(farm, cropStatuses) {
+  const available = cropStatuses.filter((crop) => ['STARTING', 'PEAK', 'ENDING_SOON'].includes(crop.stage))
+  const parts = []
+
+  if (available.length > 0) {
+    parts.push(`${available.map((crop) => crop.name).join(', ')} ${available.length === 1 ? 'is' : 'are'} in season`)
+  }
+  if (cropStatuses.some((crop) => crop.name === 'Raspberry' && crop.stage === 'PEAK')) {
+    parts.push('raspberry season is in its peak window')
+  }
+  if (farm.verificationProfile?.lastResearchedAt) {
+    parts.push(`official updates were reviewed ${formatDate(farm.verificationProfile.lastResearchedAt)}`)
+  }
+
+  return parts.length > 0
+    ? `${parts.join(', ')}.`
+    : 'We need fresher crop information before making a strong trip recommendation.'
+}
+
+export function seasonProgressPercent(farmCrop, asOfDate = new Date()) {
+  const start = farmCrop.seasonStartDate ? new Date(farmCrop.seasonStartDate).getTime() : null
+  const end = farmCrop.seasonEndDate ? new Date(farmCrop.seasonEndDate).getTime() : null
+  if (!start || !end || end <= start) return 50
+  const progress = ((asOfDate.getTime() - start) / (end - start)) * 100
+  return Math.max(0, Math.min(100, Math.round(progress)))
+}

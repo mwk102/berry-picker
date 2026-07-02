@@ -13,7 +13,7 @@ function worthLabel(score) {
   return 'Needs more data'
 }
 
-export function FarmStatusPanel({ confidence, cropStatuses, farm, worthTheDriveScore }) {
+export function FarmStatusPanel({ confidence, cropStatuses, farm, worthTheDrive }) {
   return (
     <section className="farm-panel status-panel">
       <div className="panel-heading">
@@ -38,8 +38,17 @@ export function FarmStatusPanel({ confidence, cropStatuses, farm, worthTheDriveS
         </span>
         <span>
           <strong>Worth the drive?</strong>
-          {worthLabel(worthTheDriveScore)} · {worthTheDriveScore}/100
+          {worthLabel(worthTheDrive.score)} - {worthTheDrive.score}/100
         </span>
+      </div>
+
+      <div className="worth-drive-reasons">
+        <strong>Reasons</strong>
+        <ul>
+          {worthTheDrive.reasons.map((reason) => (
+            <li key={reason}>{reason}</li>
+          ))}
+        </ul>
       </div>
     </section>
   )

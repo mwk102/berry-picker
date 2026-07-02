@@ -18,14 +18,19 @@ export function FarmReportsList({ reports }) {
                 <div>
                   <strong>{report.crop?.name || report.condition}</strong>
                   <span>
-                    {report.condition} · {report.crowdLevel}
+                    {report.condition} - {report.crowdLevel}
                   </span>
                 </div>
                 {report.comment ? <p>{report.comment}</p> : null}
                 <span>
-                  {report.source} · {formatDateTime(report.createdAt)}
-                  {freshness === null ? '' : ` · ${freshness}d old`}
+                  {report.source} - {formatDateTime(report.createdAt)}
+                  {freshness === null ? '' : ` - ${freshness}d old`}
                 </span>
+                {report.sourceUrl ? (
+                  <a href={report.sourceUrl} rel="noreferrer" target="_blank">
+                    Source reviewed by {report.verificationMethod || 'manual review'}
+                  </a>
+                ) : null}
               </article>
             )
           })}

@@ -9,6 +9,8 @@ const sourceLabels = {
   GOOGLE_PLACES: 'Google Places',
   OPENSTREETMAP: 'OpenStreetMap',
   MANUAL_RESEARCH: 'Manual Research',
+  FARM_WEBSITE: 'Official Website',
+  ADMIN: 'Admin Review',
 }
 
 export function formatDataSource(dataSource) {
