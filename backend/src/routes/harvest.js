@@ -9,8 +9,35 @@ function parseRefresh(value) {
   throw badRequest('refresh must be either true or false')
 }
 
-function createHarvestRouter(harvestRadarService) {
+function createHarvestRouter(harvestRadarService, harvestSignalsService) {
   const router = express.Router()
+
+  router.get('/signals', async (_req, res, next) => {
+    try {
+      const result = await harvestSignalsService.getSignals()
+      res.json(result)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  router.get('/trends', async (_req, res, next) => {
+    try {
+      const result = await harvestSignalsService.getTrends()
+      res.json(result)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  router.get('/timeline', async (_req, res, next) => {
+    try {
+      const result = await harvestSignalsService.getTimeline()
+      res.json(result)
+    } catch (error) {
+      next(error)
+    }
+  })
 
   router.get('/', async (req, res, next) => {
     try {

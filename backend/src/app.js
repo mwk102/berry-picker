@@ -8,6 +8,7 @@ const { createHarvestRepository } = require('./repositories/harvestRepository')
 const { createCropService } = require('./services/cropService')
 const { createFarmService } = require('./services/farmService')
 const { createHarvestRadarService } = require('./services/harvestRadarService')
+const { createHarvestSignalsService } = require('./services/harvestSignalsService')
 const { createSearchService } = require('./services/searchService')
 const { createCropRouter } = require('./routes/crops')
 const { createFarmRouter } = require('./routes/farms')
@@ -26,6 +27,7 @@ function createApp() {
   const farmService = createFarmService(farmRepository)
   const cropService = createCropService(cropRepository, farmService)
   const harvestRadarService = createHarvestRadarService(harvestRepository)
+  const harvestSignalsService = createHarvestSignalsService(harvestRepository)
   const searchService = createSearchService(farmService, cropRepository)
 
   app.get('/api/health', (_req, res) => {
@@ -34,7 +36,7 @@ function createApp() {
 
   app.use('/api/farms', createFarmRouter(farmService))
   app.use('/api/crops', createCropRouter(cropService))
-  app.use('/api/harvest', createHarvestRouter(harvestRadarService))
+  app.use('/api/harvest', createHarvestRouter(harvestRadarService, harvestSignalsService))
   app.use('/api/search', createSearchRouter(searchService))
 
   app.use(notFoundHandler)

@@ -31,12 +31,18 @@ const cropInclude = {
       amount: { not: null },
       farm: publicFarmWhere,
     },
+    include: {
+      farm: true,
+    },
     orderBy: [{ effectiveStartDate: 'desc' }, { createdAt: 'desc' }],
   },
   reports: {
     where: {
       isApproved: true,
       farm: publicFarmWhere,
+    },
+    include: {
+      farm: true,
     },
     orderBy: { createdAt: 'desc' },
   },
