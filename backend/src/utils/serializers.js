@@ -6,6 +6,9 @@ function decimalToNumber(value) {
 function serializePrice(price) {
   return {
     id: price.id,
+    farmId: price.farmId,
+    farmCropId: price.farmCropId,
+    cropId: price.cropId,
     priceType: price.priceType,
     amount: decimalToNumber(price.amount),
     currency: price.currency,

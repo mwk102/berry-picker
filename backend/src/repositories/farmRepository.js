@@ -1,4 +1,5 @@
-const farmInclude = {
+function createFarmInclude(now = new Date()) {
+  return {
   hours: {
     orderBy: [{ dayOfWeek: 'asc' }, { openTime: 'asc' }],
   },
@@ -32,7 +33,13 @@ const farmInclude = {
     take: 5,
   },
   announcements: {
-    where: { isPublished: true },
+    where: {
+      isPublished: true,
+      AND: [
+        { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+        { OR: [{ endsAt: null }, { endsAt: { gte: now } }] },
+      ],
+    },
     orderBy: [{ startsAt: 'desc' }, { createdAt: 'desc' }],
   },
   sources: {
@@ -42,6 +49,7 @@ const farmInclude = {
     orderBy: { updatedAt: 'desc' },
     take: 1,
   },
+}
 }
 
 function buildFarmWhere(filters = {}) {
@@ -114,7 +122,7 @@ function createFarmRepository(prisma) {
         prisma.farm.count({ where }),
         prisma.farm.findMany({
           where,
-          include: farmInclude,
+          include: createFarmInclude(),
           orderBy: [{ name: 'asc' }],
           take: filters.limit,
           skip: filters.offset,
@@ -127,7 +135,7 @@ function createFarmRepository(prisma) {
     async findFarmBySlug(slug) {
       return prisma.farm.findFirst({
         where: { slug, isActive: true, reviewStatus: 'APPROVED' },
-        include: farmInclude,
+        include: createFarmInclude(),
       })
     },
 
@@ -137,7 +145,7 @@ function createFarmRepository(prisma) {
         prisma.farm.count({ where }),
         prisma.farm.findMany({
           where,
-          include: farmInclude,
+          include: createFarmInclude(),
           orderBy: [{ name: 'asc' }],
           take: filters.limit,
           skip: filters.offset,

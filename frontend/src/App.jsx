@@ -19,7 +19,7 @@ function App() {
           <Route element={<AppLayout />}>
             <Route index element={<HarvestRadarPage />} />
             <Route path="farms" element={<MapPage />} />
-            <Route path="farms/:farmId" element={<FarmDetails />} />
+            <Route path="farms/:slug" element={<FarmDetails />} />
             <Route path="season-calendar" element={<SeasonCalendar />} />
             <Route path="weekend-picks" element={<WeekendPicks />} />
             <Route path="admin" element={<Admin />} />
