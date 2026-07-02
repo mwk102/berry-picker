@@ -22,6 +22,8 @@ const defaultFilters = {
 function sortFarms(farmsToSort, sortBy) {
   return [...farmsToSort].sort((firstFarm, secondFarm) => {
     if (sortBy === 'price') {
+      if (!Number.isFinite(firstFarm.pricePerPound)) return 1
+      if (!Number.isFinite(secondFarm.pricePerPound)) return -1
       return firstFarm.pricePerPound - secondFarm.pricePerPound
     }
 
@@ -44,7 +46,7 @@ export function MapPage() {
       search: filters.search || undefined,
       crop: filters.berryType === 'all' ? undefined : filters.berryType,
       includeUnverified: filters.showUnverifiedCandidates || undefined,
-      limit: 100,
+      limit: filters.showUnverifiedCandidates ? 300 : 100,
       offset: 0,
     }),
     [filters.search, filters.berryType, filters.showUnverifiedCandidates],
@@ -86,7 +88,11 @@ export function MapPage() {
     const visibleFarms = farmsWithDistance.filter((farm) => {
       const matchesOpenNow = !filters.openNow || farm.status === 'Open'
       const matchesRadius = farm.distanceMiles <= filters.radiusMiles
-      const matchesPrice = farm.pricePerPound <= filters.maxPricePerPound
+      const hasUnknownCandidatePrice =
+        farm.isUnverifiedCandidate && !Number.isFinite(farm.pricePerPound)
+      const matchesPrice =
+        hasUnknownCandidatePrice ||
+        farm.pricePerPound <= filters.maxPricePerPound
 
       return matchesOpenNow && matchesRadius && matchesPrice
     })

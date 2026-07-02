@@ -235,7 +235,7 @@ export async function importCandidateFarm(
       isClaimed: false,
       // TODO(admin-review): add approve, reject, edit, and mark-verified actions
       // that move candidates out of PENDING_REVIEW before public launch.
-      isActive: true,
+      isActive: false,
       dataSource,
       reviewStatus: "PENDING_REVIEW",
       sources: {

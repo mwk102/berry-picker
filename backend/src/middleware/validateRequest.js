@@ -1,6 +1,6 @@
 const { badRequest } = require('../utils/errors')
 
-const MAX_LIMIT = 100
+const MAX_LIMIT = 300
 const DEFAULT_LIMIT = 20
 
 function parseBoolean(value, fieldName) {

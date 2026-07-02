@@ -11,6 +11,7 @@
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset",
     "db:seed": "tsx prisma/seed.ts",
+    "import:candidates": "tsx imports/candidate-sources/import-candidates.ts",
     "import:google-candidates": "tsx imports/candidate-sources/import-google-candidates.ts",
     "import:osm-candidates": "tsx imports/candidate-sources/import-osm-candidates.ts",
     "test": "echo \"Error: no test specified\" && exit 1"

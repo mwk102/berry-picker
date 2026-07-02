@@ -38,6 +38,10 @@ const farmInclude = {
   sources: {
     orderBy: { importedAt: 'desc' },
   },
+  candidates: {
+    orderBy: { updatedAt: 'desc' },
+    take: 1,
+  },
 }
 
 function buildFarmWhere(filters = {}) {

@@ -128,6 +128,15 @@ function serializeFarm(farm) {
           lastSeenAt: source.lastSeenAt,
         }))
       : [],
+    candidateReview: farm.candidates?.[0]
+      ? {
+          id: farm.candidates[0].id,
+          confidenceScore: farm.candidates[0].confidenceScore,
+          verificationStatus: farm.candidates[0].verificationStatus,
+          evidenceJson: farm.candidates[0].evidenceJson,
+          updatedAt: farm.candidates[0].updatedAt,
+        }
+      : null,
   }
 }
 

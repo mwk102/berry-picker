@@ -116,6 +116,13 @@ enum CandidateReviewStatus {
   REJECTED
 }
 
+enum CandidateVerificationStatus {
+  PENDING_REVIEW
+  AUTO_APPROVED
+  NEEDS_REVIEW
+  REJECTED
+}
+
 model User {
   id           String   @id @default(uuid()) @db.Uuid
   name         String?
@@ -172,6 +179,7 @@ model Farm {
   reports       PickingReport[]
   announcements Announcement[]
   sources       FarmSource[]
+  candidates    CandidateFarm[]
 
   @@index([city])
   @@index([state])
@@ -198,6 +206,35 @@ model FarmSource {
   @@unique([dataSource, externalId])
   @@index([farmId])
   @@index([dataSource])
+}
+
+model CandidateFarm {
+  id                 String                      @id @default(uuid()) @db.Uuid
+  name               String
+  address            String?
+  city               String?
+  state              String?
+  latitude           Decimal?                    @db.Decimal(9, 6)
+  longitude          Decimal?                    @db.Decimal(9, 6)
+  websiteUrl         String?
+  phone              String?
+  source             DataSource
+  externalId         String?
+  confidenceScore    Int                         @default(0)
+  verificationStatus CandidateVerificationStatus @default(PENDING_REVIEW)
+  evidenceJson       Json?
+  matchedFarmId      String?                     @db.Uuid
+  createdAt          DateTime                    @default(now())
+  updatedAt          DateTime                    @updatedAt
+
+  matchedFarm Farm? @relation(fields: [matchedFarmId], references: [id], onDelete: SetNull)
+
+  @@unique([source, externalId])
+  @@index([confidenceScore])
+  @@index([verificationStatus])
+  @@index([matchedFarmId])
+  @@index([source])
+  @@index([city, state])
 }
 
 model Crop {
