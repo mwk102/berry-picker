@@ -48,4 +48,12 @@ export function getCrops() {
   return request('/api/crops')
 }
 
+export function getHarvestRadar(params = {}) {
+  return request('/api/harvest', params)
+}
+
+export function getHarvestCrop(slug, params = {}) {
+  return request(`/api/harvest/${slug}`, params)
+}
+
 export { ApiError }

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useCrops } from '../hooks/useCrops'
 import { useFarms } from '../hooks/useFarms'
 import { normalizeFarm, redmondOrigin } from '../lib/farmAdapter'
@@ -36,10 +37,22 @@ function sortFarms(farmsToSort, sortBy) {
 }
 
 export function MapPage() {
-  usePageTitle('Map')
+  usePageTitle('Farm Finder')
 
-  const [filters, setFilters] = useState(defaultFilters)
+  const [searchParams] = useSearchParams()
+  const cropParam = searchParams.get('crop')
+  const [filters, setFilters] = useState(() => ({
+    ...defaultFilters,
+    berryType: cropParam || defaultFilters.berryType,
+  }))
   const [selectedFarm, setSelectedFarm] = useState(null)
+
+  useEffect(() => {
+    setFilters((currentFilters) => ({
+      ...currentFilters,
+      berryType: cropParam || defaultFilters.berryType,
+    }))
+  }, [cropParam])
 
   const farmQueryParams = useMemo(
     () => ({

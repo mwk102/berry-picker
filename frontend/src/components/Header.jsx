@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom'
 
 const navItems = [
-  { label: 'Map', to: '/' },
-  { label: 'Farm Details', to: '/farms/sample-farm' },
-  { label: 'Admin', to: '/admin' },
+  { label: 'Harvest Radar', to: '/', end: true },
+  { label: 'Farm Finder', to: '/farms' },
+  { label: 'Season Calendar', to: '/season-calendar' },
+  { label: 'Weekend Picks', to: '/weekend-picks' },
 ]
 
 export function Header() {
@@ -24,6 +25,7 @@ export function Header() {
                 isActive ? 'nav-link nav-link-active' : 'nav-link'
               }
               key={item.to}
+              end={item.end}
               to={item.to}
             >
               {item.label}
