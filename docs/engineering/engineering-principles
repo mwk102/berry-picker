@@ -1,0 +1,61 @@
+Principle 1
+
+Simple > Clever
+
+Readable code wins.
+
+Principle 2
+
+No duplicated business logic
+
+Harvest calculations should live in one place.
+
+Principle 3
+
+Everything important is typed
+
+Avoid any unless there's a compelling reason.
+
+Principle 4
+
+Every API has one clear responsibility
+
+Keep endpoints focused and predictable.
+
+Principle 5
+
+UI components should be composable
+
+Build Lego bricks, not monoliths.
+
+Principle 6
+
+Database is the source of truth
+
+Never rely on frontend calculations for business rules.
+
+Principle 7
+
+Optimize for maintainability
+
+This project may eventually have tens of thousands of farms. Decisions should support that future.
+
+One thing I'd like to be responsible for
+
+I think we should have an "Architecture Review" at the end of every few milestones.
+
+Not a product review.
+
+A technical review.
+
+Questions like:
+
+Is the folder structure still healthy?
+Are services getting too large?
+Do we need caching yet?
+Are we introducing duplicate models?
+Should this become an event instead of a synchronous call?
+Is the API still coherent?
+Where is technical debt accumulating?
+
+Those reviews prevent the project from slowly becoming difficult to work on.
