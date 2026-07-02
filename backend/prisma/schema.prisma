@@ -123,6 +123,15 @@ enum CandidateVerificationStatus {
   REJECTED
 }
 
+enum HarvestSeasonStage {
+  UNKNOWN
+  UPCOMING
+  EARLY
+  PEAK
+  LATE
+  ENDED
+}
+
 model User {
   id           String   @id @default(uuid()) @db.Uuid
   name         String?
@@ -250,12 +259,35 @@ model Crop {
   createdAt               DateTime     @default(now())
   updatedAt               DateTime     @updatedAt
 
-  farmCrops  FarmCrop[]
-  cropPrices CropPrice[]
-  reports    PickingReport[]
+  farmCrops      FarmCrop[]
+  cropPrices     CropPrice[]
+  reports        PickingReport[]
+  harvestSummary HarvestSummary?
 
   @@index([category])
   @@index([isActive])
+}
+
+model HarvestSummary {
+  id              String             @id @default(uuid()) @db.Uuid
+  cropId          String             @unique @db.Uuid
+  activeFarmCount Int                @default(0)
+  averagePrice    Decimal?           @db.Decimal(10, 2)
+  seasonStage     HarvestSeasonStage @default(UNKNOWN)
+  confidence      Int                @default(0)
+  reportFreshness Int?
+  bestRegion      String?
+  evidenceJson    Json?
+  calculatedAt    DateTime           @default(now())
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  crop Crop @relation(fields: [cropId], references: [id], onDelete: Restrict)
+
+  @@index([seasonStage])
+  @@index([confidence])
+  @@index([bestRegion])
+  @@index([calculatedAt])
 }
 
 model FarmCrop {

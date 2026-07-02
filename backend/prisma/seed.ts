@@ -1,8 +1,13 @@
 import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { join } from "node:path";
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
+
+const require = createRequire(import.meta.url);
+const { createHarvestRepository } = require("../src/repositories/harvestRepository");
+const { createHarvestRadarService } = require("../src/services/harvestRadarService");
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -101,6 +106,7 @@ const summary = {
   prices: 0,
   reports: 0,
   announcements: 0,
+  harvestSummaries: 0,
 };
 
 function date(value: string) {
@@ -339,6 +345,13 @@ async function seedAnnouncements() {
   }
 }
 
+async function seedHarvestSummaries() {
+  const harvestRepository = createHarvestRepository(prisma);
+  const harvestRadarService = createHarvestRadarService(harvestRepository);
+  const summaries = await harvestRadarService.recalculateAll(new Date());
+  summary.harvestSummaries = summaries.length;
+}
+
 async function main() {
   await seedCrops();
   await seedAmenities();
@@ -348,6 +361,7 @@ async function main() {
   await seedCropPrices();
   await seedPickingReports();
   await seedAnnouncements();
+  await seedHarvestSummaries();
 
   console.log("Northwest U-Pick seed summary");
   console.table({
@@ -358,6 +372,7 @@ async function main() {
     "prices created/updated": summary.prices,
     "reports created/updated": summary.reports,
     "announcements created/updated": summary.announcements,
+    "harvest summaries recalculated": summary.harvestSummaries,
   });
 }
 

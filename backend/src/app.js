@@ -4,11 +4,14 @@ const { prisma } = require('./db/prisma')
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler')
 const { createCropRepository } = require('./repositories/cropRepository')
 const { createFarmRepository } = require('./repositories/farmRepository')
+const { createHarvestRepository } = require('./repositories/harvestRepository')
 const { createCropService } = require('./services/cropService')
 const { createFarmService } = require('./services/farmService')
+const { createHarvestRadarService } = require('./services/harvestRadarService')
 const { createSearchService } = require('./services/searchService')
 const { createCropRouter } = require('./routes/crops')
 const { createFarmRouter } = require('./routes/farms')
+const { createHarvestRouter } = require('./routes/harvest')
 const { createSearchRouter } = require('./routes/search')
 
 function createApp() {
@@ -19,8 +22,10 @@ function createApp() {
 
   const farmRepository = createFarmRepository(prisma)
   const cropRepository = createCropRepository(prisma)
+  const harvestRepository = createHarvestRepository(prisma)
   const farmService = createFarmService(farmRepository)
   const cropService = createCropService(cropRepository, farmService)
+  const harvestRadarService = createHarvestRadarService(harvestRepository)
   const searchService = createSearchService(farmService, cropRepository)
 
   app.get('/api/health', (_req, res) => {
@@ -29,6 +34,7 @@ function createApp() {
 
   app.use('/api/farms', createFarmRouter(farmService))
   app.use('/api/crops', createCropRouter(cropService))
+  app.use('/api/harvest', createHarvestRouter(harvestRadarService))
   app.use('/api/search', createSearchRouter(searchService))
 
   app.use(notFoundHandler)
