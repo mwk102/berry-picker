@@ -49,7 +49,11 @@
     "timezone": "America/Los_Angeles",
     "phone": "425-298-5125",
     "websiteUrl": "https://harvoldberryfarm.com/",
+      "sourceName": "Harvold Berry Farm official website",
       "sourceUrl": "https://harvoldberryfarm.com/location-%26-price",
+      "contactSourceUrl": "https://harvoldberryfarm.com/contact-us",
+      "addressSourceUrl": "https://harvoldberryfarm.com/contact-us",
+      "referenceStatus": "GOLD_STANDARD",
       "lastVerifiedAt": "2026-07-02T00:00:00.000Z",
       "verificationConfidence": 95,
       "nextReviewAt": "2026-07-09T00:00:00.000Z",
@@ -111,6 +115,336 @@
       ],
       "announcementSourceUrl": "https://harvoldberryfarm.com/",
       "announcement": "Verified from official Harvold Berry Farm website. Check the farm website before visiting because berry fields may close when picked out."
+  },
+  {
+    "slug": "remlinger-farms",
+    "name": "Remlinger Farms",
+    "description": "Reference farm in Carnation, WA with officially sourced U-pick raspberry, strawberry, and pumpkin information. Current crop status changes quickly, so time-sensitive details need frequent review.",
+    "addressLine1": "32610 NE 32nd Street",
+    "city": "Carnation",
+    "state": "WA",
+    "postalCode": "98014",
+    "county": "King",
+    "country": "US",
+    "latitude": 47.639428,
+    "longitude": -121.902034,
+    "timezone": "America/Los_Angeles",
+    "phone": "425-333-4135 ext 250",
+    "websiteUrl": "https://remlingerfarms.com/",
+    "sourceName": "Remlinger Farms official website",
+    "sourceUrl": "https://remlingerfarms.com/",
+    "contactSourceUrl": "https://remlingerfarms.com/",
+    "addressSourceUrl": "https://remlingerfarms.com/",
+    "coordinateSourceUrl": "https://www.openstreetmap.org/way/796849039",
+    "coordinatesConfidence": 76,
+    "lastVerifiedAt": "2026-07-02T00:00:00.000Z",
+    "verificationConfidence": 88,
+    "referenceStatus": "VERIFIED",
+    "nextReviewAt": "2026-07-05T00:00:00.000Z",
+    "sourceUrls": [
+      "https://remlingerfarms.com/",
+      "https://www.openstreetmap.org/way/796849039"
+    ],
+    "manualNotes": "Reference farm. Official website confirms Carnation campus address, phone, U-pick raspberry update, and seasonal strawberry/pumpkin messaging. Pricing and normal weekly U-pick hours still need source confirmation.",
+    "heroImageUrl": "",
+    "galleryImages": [],
+    "photoAttribution": "Photo placeholder until real farm photos are licensed or owner-provided.",
+    "personality": {
+      "bestFor": ["Family Friendly", "Large Groups", "Weekend Farm Trip"],
+      "knownFor": ["Raspberries", "Pumpkin Patch", "Family Fun Park"]
+    },
+    "isVerified": true,
+    "cropSlugs": ["raspberry", "strawberry", "pumpkin"],
+    "amenitySlugs": ["kid-friendly", "farm-store", "food-available"],
+    "fieldLocations": {
+      "raspberry": "32610 NE 32nd Street, Carnation, WA 98014"
+    },
+    "cropNotes": {
+      "raspberry": "Official homepage listed Raspberry U-Pick at the main farm campus for July 2-4, 2026.",
+      "strawberry": "Official homepage indicated strawberry U-pick was closed for the season at the time of review.",
+      "pumpkin": "Official homepage indicated the pumpkin patch was closed and expected back in September 2026."
+    },
+    "currentReports": [
+      {
+        "cropSlug": "raspberry",
+        "condition": "GOOD",
+        "crowdLevel": "UNKNOWN",
+        "rating": 4,
+        "sourceUrl": "https://remlingerfarms.com/",
+        "comment": "Official homepage update listed Raspberry U-Pick open July 2, 3, and 4 at the main farm campus."
+      },
+      {
+        "cropSlug": "strawberry",
+        "condition": "CLOSED",
+        "crowdLevel": "UNKNOWN",
+        "rating": 1,
+        "sourceUrl": "https://remlingerfarms.com/",
+        "comment": "Official homepage update indicated strawberry U-pick was closed for the season."
+      }
+    ],
+    "announcementSourceUrl": "https://remlingerfarms.com/",
+    "announcement": "Reference profile seeded from official Remlinger Farms website. Check the farm website before visiting because U-pick crop status is date-sensitive."
+  },
+  {
+    "slug": "henna-blueberry-farm",
+    "name": "Henna Blueberry Farm",
+    "description": "Reference blueberry farm in the Snoqualmie River Valley near Carnation, WA. Official website confirms U-pick blueberries, address, and growing-practice notes; hours and pricing need review.",
+    "addressLine1": "32500 NE 60th Street",
+    "city": "Carnation",
+    "state": "WA",
+    "postalCode": "98014",
+    "county": "King",
+    "country": "US",
+    "latitude": 47.592303,
+    "longitude": -121.906102,
+    "timezone": "America/Los_Angeles",
+    "websiteUrl": "https://hennablueberryfarm.com/",
+    "sourceName": "Henna Blueberry Farm official website",
+    "sourceUrl": "https://hennablueberryfarm.com/",
+    "contactSourceUrl": "https://hennablueberryfarm.com/",
+    "addressSourceUrl": "https://hennablueberryfarm.com/",
+    "coordinateSourceUrl": "https://www.openstreetmap.org/way/663084049",
+    "coordinatesConfidence": 70,
+    "lastVerifiedAt": "2026-07-02T00:00:00.000Z",
+    "verificationConfidence": 84,
+    "referenceStatus": "VERIFIED",
+    "nextReviewAt": "2026-07-09T00:00:00.000Z",
+    "sourceUrls": [
+      "https://hennablueberryfarm.com/",
+      "https://hennablueberryfarm.com/u-pick-hours-new/",
+      "https://www.openstreetmap.org/way/663084049"
+    ],
+    "manualNotes": "Reference farm. Official website confirms U-pick blueberries, Carnation/Snoqualmie River Valley positioning, address, blueberry varieties, U-pick hours, payment flow, and U-pick blueberry price. Phone, amenities, and current field conditions still need review.",
+    "heroImageUrl": "",
+    "galleryImages": [],
+    "photoAttribution": "Photo placeholder until real farm photos are licensed or owner-provided.",
+    "personality": {
+      "bestFor": ["Quick Berry Trip", "Blueberry Picking"],
+      "knownFor": ["Blueberries", "Duke Blueberries", "Reka Blueberries", "Draper Blueberries"]
+    },
+    "isVerified": true,
+    "cropSlugs": ["blueberry"],
+    "amenitySlugs": [],
+    "fieldLocations": {
+      "blueberry": "32500 NE 60th Street, Carnation, WA 98014"
+    },
+    "cropNotes": {
+      "blueberry": "Official website describes U-pick blueberries and lists Duke, Reka, and Draper among primary varieties."
+    },
+    "priceOverrides": {
+      "blueberry": { "priceType": "PER_POUND", "amount": "3.90", "unitLabel": "lb", "notes": "Official U Pick Hours page lists U-pick blueberries at $3.90/lb." }
+    },
+    "hourWindows": [
+      {
+        "dayOfWeek": "TUESDAY",
+        "openTime": "08:00",
+        "closeTime": "13:00",
+        "sourceUrl": "https://hennablueberryfarm.com/u-pick-hours-new/",
+        "notes": "Official U Pick Hours page lists Tuesday morning U-pick from 8:00 AM to 1:00 PM."
+      },
+      {
+        "dayOfWeek": "TUESDAY",
+        "openTime": "18:00",
+        "closeTime": "21:00",
+        "sourceUrl": "https://hennablueberryfarm.com/u-pick-hours-new/",
+        "notes": "Official U Pick Hours page lists Tuesday evening U-pick from 6:00 PM to 9:00 PM."
+      },
+      {
+        "dayOfWeek": "WEDNESDAY",
+        "openTime": "08:00",
+        "closeTime": "13:00",
+        "sourceUrl": "https://hennablueberryfarm.com/u-pick-hours-new/",
+        "notes": "Official U Pick Hours page lists Wednesday morning U-pick from 8:00 AM to 1:00 PM."
+      },
+      {
+        "dayOfWeek": "WEDNESDAY",
+        "openTime": "18:00",
+        "closeTime": "21:00",
+        "sourceUrl": "https://hennablueberryfarm.com/u-pick-hours-new/",
+        "notes": "Official U Pick Hours page lists Wednesday evening U-pick from 6:00 PM to 9:00 PM."
+      },
+      {
+        "dayOfWeek": "THURSDAY",
+        "openTime": "08:00",
+        "closeTime": "13:00",
+        "sourceUrl": "https://hennablueberryfarm.com/u-pick-hours-new/",
+        "notes": "Official U Pick Hours page lists Thursday morning U-pick from 8:00 AM to 1:00 PM."
+      },
+      {
+        "dayOfWeek": "THURSDAY",
+        "openTime": "18:00",
+        "closeTime": "21:00",
+        "sourceUrl": "https://hennablueberryfarm.com/u-pick-hours-new/",
+        "notes": "Official U Pick Hours page lists Thursday evening U-pick from 6:00 PM to 9:00 PM."
+      },
+      {
+        "dayOfWeek": "FRIDAY",
+        "openTime": "08:00",
+        "closeTime": "13:00",
+        "sourceUrl": "https://hennablueberryfarm.com/u-pick-hours-new/",
+        "notes": "Official U Pick Hours page lists Friday U-pick from 8:00 AM to 1:00 PM."
+      },
+      {
+        "dayOfWeek": "SATURDAY",
+        "openTime": "08:00",
+        "closeTime": "13:00",
+        "sourceUrl": "https://hennablueberryfarm.com/u-pick-hours-new/",
+        "notes": "Official U Pick Hours page lists Saturday U-pick from 8:00 AM to 1:00 PM and recommends calling ahead on weekends."
+      },
+      {
+        "dayOfWeek": "SUNDAY",
+        "openTime": "08:00",
+        "closeTime": "13:00",
+        "sourceUrl": "https://hennablueberryfarm.com/u-pick-hours-new/",
+        "notes": "Official U Pick Hours page lists Sunday U-pick from 8:00 AM to 1:00 PM and recommends calling ahead on weekends."
+      }
+    ],
+    "currentReports": [
+      {
+        "cropSlug": "blueberry",
+        "condition": "UNKNOWN",
+        "crowdLevel": "UNKNOWN",
+        "rating": 3,
+        "sourceUrl": "https://hennablueberryfarm.com/u-pick-hours-new/",
+        "comment": "Official U Pick Hours page lists blueberry U-pick hours and says fields may close early when picked out; call ahead to confirm field availability."
+      }
+    ],
+    "announcementSourceUrl": "https://hennablueberryfarm.com/u-pick-hours-new/",
+    "announcement": "Official Henna Blueberry Farm U-pick page lists blueberry U-pick at $3.90/lb and recommends calling ahead on weekends or when fields may be picked out."
+  },
+  {
+    "slug": "bailey-farm",
+    "name": "Bailey Farm",
+    "description": "Reference Pick-Your-Own produce farm in Snohomish, WA. Official website confirms current U-pick strawberry and raspberry pricing, July 2-4 hours, location, phone, and mixed vegetable availability.",
+    "addressLine1": "12968 Springhetti Road",
+    "city": "Snohomish",
+    "state": "WA",
+    "postalCode": "98296",
+    "county": "Snohomish",
+    "country": "US",
+    "latitude": 47.880846,
+    "longitude": -122.098604,
+    "timezone": "America/Los_Angeles",
+    "phone": "360-568-8826",
+    "websiteUrl": "https://www.baileyveg.com/",
+    "sourceName": "Bailey Farm official website",
+    "sourceUrl": "https://www.baileyveg.com/",
+    "contactSourceUrl": "https://www.baileyveg.com/",
+    "addressSourceUrl": "https://www.baileyveg.com/",
+    "coordinateSourceUrl": "https://www.openstreetmap.org/way/700682104",
+    "coordinatesConfidence": 78,
+    "lastVerifiedAt": "2026-07-02T00:00:00.000Z",
+    "verificationConfidence": 92,
+    "referenceStatus": "VERIFIED",
+    "nextReviewAt": "2026-07-05T00:00:00.000Z",
+    "sourceUrls": [
+      "https://www.baileyveg.com/",
+      "https://www.openstreetmap.org/way/700682104"
+    ],
+    "manualNotes": "Reference farm. Official website confirms Pick-Your-Own farm name, Snohomish address, phone, July 2-4 U-pick hours, strawberry and raspberry status/pricing, and vegetable availability. Amenities and broader seasonal hours need review.",
+    "heroImageUrl": "",
+    "galleryImages": [],
+    "photoAttribution": "Photo placeholder until real farm photos are licensed or owner-provided.",
+    "personality": {
+      "bestFor": ["Quick Berry Trip", "Vegetable Picking", "Family Friendly"],
+      "knownFor": ["Strawberries", "Raspberries", "Pick-Your-Own Produce"]
+    },
+    "isVerified": true,
+    "cropSlugs": ["strawberry", "raspberry", "vegetables"],
+    "amenitySlugs": [],
+    "cropNotes": {
+      "strawberry": "Official homepage listed U-pick strawberries open at $4/lb during the July 2-4 update.",
+      "raspberry": "Official homepage listed U-pick raspberries open at $6/lb during the July 2-4 update.",
+      "vegetables": "Official homepage listed several U-pick vegetables open during the July 2-4 update."
+    },
+    "priceOverrides": {
+      "strawberry": { "priceType": "PER_POUND", "amount": "4.00", "unitLabel": "lb", "notes": "Official homepage listed U-pick strawberries at $4/lb." },
+      "raspberry": { "priceType": "PER_POUND", "amount": "6.00", "unitLabel": "lb", "notes": "Official homepage listed U-pick raspberries at $6/lb." }
+    },
+    "hours": {
+      "openDays": ["THURSDAY", "FRIDAY", "SATURDAY"],
+      "openTime": "08:00",
+      "closeTime": "17:30",
+      "closedDays": ["MONDAY", "TUESDAY", "WEDNESDAY", "SUNDAY"],
+      "sourceUrl": "https://www.baileyveg.com/",
+      "notes": "Official homepage listed U-Pick open Thursday through Saturday, July 2-4, from 8:00am to 5:30pm. Treat as a current update, not guaranteed normal weekly hours."
+    },
+    "currentReports": [
+      {
+        "cropSlug": "strawberry",
+        "condition": "GOOD",
+        "crowdLevel": "UNKNOWN",
+        "rating": 4,
+        "sourceUrl": "https://www.baileyveg.com/",
+        "comment": "Official homepage update listed U-pick strawberries open at $4/lb."
+      },
+      {
+        "cropSlug": "raspberry",
+        "condition": "GOOD",
+        "crowdLevel": "UNKNOWN",
+        "rating": 4,
+        "sourceUrl": "https://www.baileyveg.com/",
+        "comment": "Official homepage update listed U-pick raspberries open at $6/lb."
+      }
+    ],
+    "announcementSourceUrl": "https://www.baileyveg.com/",
+    "announcement": "Reference profile seeded from official Bailey Farm website. Current U-pick hours and availability should be reviewed before each busy weekend."
+  },
+  {
+    "slug": "bells-farm",
+    "name": "Bell's Farm",
+    "description": "Reference farm on Whidbey Island near Coupeville, WA. Official and cooperative sources confirm the farm stand, strawberries, vegetables, flowers, regenerative growing practices, address, and phone. U-pick berry status, current hours, and prices still need direct confirmation.",
+    "addressLine1": "892 West Beach Rd",
+    "city": "Coupeville",
+    "state": "WA",
+    "postalCode": "98239",
+    "county": "Island",
+    "country": "US",
+    "latitude": 48.2309,
+    "longitude": -122.7616,
+    "timezone": "America/Los_Angeles",
+    "phone": "360-678-4808",
+    "websiteUrl": "https://www.bells-farm.com/",
+    "sourceName": "Bell's Farm official website",
+    "sourceUrl": "https://www.bells-farm.com/",
+    "contactSourceUrl": "https://www.bells-farm.com/",
+    "addressSourceUrl": "https://www.bells-farm.com/",
+    "coordinateSourceUrl": "manual address research from 892 West Beach Rd, Coupeville, WA 98239",
+    "coordinatesConfidence": 62,
+    "lastVerifiedAt": "2026-07-02T00:00:00.000Z",
+    "verificationConfidence": 82,
+    "referenceStatus": "VERIFIED",
+    "nextReviewAt": "2026-07-09T00:00:00.000Z",
+    "sourceUrls": [
+      "https://www.bells-farm.com/",
+      "https://www.whidbeyislandgrown.com/bells-farm",
+      "https://www.facebook.com/bellsfarmwhidbey/"
+    ],
+    "manualNotes": "Reference farm. Official website confirms name, address, phone, farm stand, flowers, and growing-practice claims. Whidbey Island Grown profile confirms strawberries, vegetables, farm stand, and Whidbey/Coupeville context. Facebook page was identified but not readable in this environment, so no facts were verified from Facebook. Current U-pick berry status, hours, and pricing need review.",
+    "heroImageUrl": "",
+    "galleryImages": [],
+    "photoAttribution": "Photo placeholder until real farm photos are licensed or owner-provided.",
+    "personality": {
+      "bestFor": ["Farm Stand Visit", "Local Produce", "Whidbey Island Trip"],
+      "knownFor": ["Strawberries", "Vegetables", "Flowers", "Regenerative Farming"]
+    },
+    "isVerified": true,
+    "cropSlugs": ["strawberry", "vegetables"],
+    "uPickCropSlugs": {
+      "strawberry": false,
+      "vegetables": false
+    },
+    "amenitySlugs": ["farm-store"],
+    "fieldLocations": {
+      "strawberry": "892 West Beach Rd, Coupeville, WA 98239",
+      "vegetables": "892 West Beach Rd, Coupeville, WA 98239"
+    },
+    "cropNotes": {
+      "strawberry": "Whidbey Island Grown profile says Bell's Farm has been known for strawberries and grows multiple varieties. U-pick strawberry status is not confirmed.",
+      "vegetables": "Whidbey Island Grown profile says Bell's Farm grows roughly 100 varieties of vegetables. U-pick vegetable status is not confirmed."
+    },
+    "announcementSourceUrl": "https://www.bells-farm.com/",
+    "announcement": "Reference profile seeded from Bell's Farm official website and Whidbey Island Grown. Needs review before presenting any U-pick berry availability, hours, or prices."
   },
   {
     "slug": "sammamish-valley-fields",

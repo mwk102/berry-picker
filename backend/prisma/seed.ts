@@ -32,6 +32,7 @@ const crops = [
   { slug: "pumpkin", name: "Pumpkin", category: "PUMPKIN", defaultSeasonStartMonth: 9, defaultSeasonEndMonth: 10, icon: "pumpkin", color: "#d8742f" },
   { slug: "sunflower", name: "Sunflower", category: "FLOWER", defaultSeasonStartMonth: 7, defaultSeasonEndMonth: 9, icon: "sunflower", color: "#d5a51f" },
   { slug: "lavender", name: "Lavender", category: "FLOWER", defaultSeasonStartMonth: 6, defaultSeasonEndMonth: 8, icon: "lavender", color: "#7d63a8" },
+  { slug: "vegetables", name: "Vegetables", category: "VEGETABLE", defaultSeasonStartMonth: 6, defaultSeasonEndMonth: 10, icon: "leaf", color: "#4f8f48" },
   { slug: "corn-maze", name: "Corn Maze", category: "ATTRACTION", defaultSeasonStartMonth: 9, defaultSeasonEndMonth: 10, icon: "corn", color: "#b38a2e" },
   { slug: "christmas-tree", name: "Christmas Tree", category: "CHRISTMAS_TREE", defaultSeasonStartMonth: 11, defaultSeasonEndMonth: 12, icon: "tree", color: "#1f6b46" },
 ] as const;
@@ -61,6 +62,7 @@ const seasonByCrop: Record<string, { start: string; end: string; peakStart: stri
   pumpkin: { start: "2026-09-20", end: "2026-10-31", peakStart: "2026-10-01", peakEnd: "2026-10-25" },
   sunflower: { start: "2026-07-20", end: "2026-09-15", peakStart: "2026-08-05", peakEnd: "2026-08-30" },
   lavender: { start: "2026-06-20", end: "2026-08-15", peakStart: "2026-07-01", peakEnd: "2026-07-25" },
+  vegetables: { start: "2026-06-01", end: "2026-10-31", peakStart: "2026-07-01", peakEnd: "2026-09-15" },
   "corn-maze": { start: "2026-09-15", end: "2026-10-31", peakStart: "2026-10-01", peakEnd: "2026-10-25" },
   "christmas-tree": { start: "2026-11-20", end: "2026-12-20", peakStart: "2026-11-28", peakEnd: "2026-12-12" },
 };
@@ -75,6 +77,7 @@ const priceByCrop: Record<string, { priceType: string; amount: string; unitLabel
   pumpkin: { priceType: "PER_BUCKET", amount: "8.00", unitLabel: "item" },
   sunflower: { priceType: "PER_PERSON", amount: "7.00", unitLabel: "person" },
   lavender: { priceType: "FLAT_ENTRY", amount: "6.00", unitLabel: "entry" },
+  vegetables: { priceType: "UNKNOWN", amount: null as unknown as string, unitLabel: "item" },
   "corn-maze": { priceType: "PER_PERSON", amount: "10.00", unitLabel: "person" },
   "christmas-tree": { priceType: "UNKNOWN", amount: null as unknown as string, unitLabel: "tree" },
 };
@@ -92,10 +95,16 @@ type FarmImport = {
   latitude: number;
   longitude: number;
   timezone: string;
-  phone: string;
+  phone?: string;
   websiteUrl: string;
   sourceUrl?: string;
   sourceUrls?: string[];
+  sourceName?: string;
+  contactSourceUrl?: string;
+  addressSourceUrl?: string;
+  coordinateSourceUrl?: string;
+  coordinatesConfidence?: number;
+  referenceStatus?: "PENDING_REVIEW" | "VERIFIED" | "GOLD_STANDARD" | "NEEDS_REVIEW";
   lastVerifiedAt?: string;
   nextReviewAt?: string;
   verificationConfidence?: number;
@@ -109,6 +118,7 @@ type FarmImport = {
   };
   isVerified?: boolean;
   cropSlugs: string[];
+  uPickCropSlugs?: Record<string, boolean>;
   amenitySlugs: string[];
   fieldLocations?: Record<string, string>;
   cropNotes?: Record<string, string>;
@@ -121,6 +131,13 @@ type FarmImport = {
     sourceUrl?: string;
     notes: string;
   };
+  hourWindows?: Array<{
+    dayOfWeek: string;
+    openTime: string;
+    closeTime: string;
+    sourceUrl?: string;
+    notes: string;
+  }>;
   currentReports?: Array<{
     cropSlug: string;
     condition: string;
@@ -225,6 +242,8 @@ async function seedFarms() {
           "harvold-s-raspberry-u-pick",
           "harvolds-farm",
           "harvold-farms",
+          "remlinger-farms-2",
+          "bailey-farm-apartments",
         ],
       },
     },
@@ -247,9 +266,10 @@ async function seedFarms() {
         latitude: farm.latitude,
         longitude: farm.longitude,
         timezone: farm.timezone,
-        phone: farm.phone,
+        phone: farm.phone || null,
         websiteUrl: farm.websiteUrl,
         status: "ACTIVE",
+        reviewStatus: "APPROVED",
         dataSource: farm.isVerified ? "FARM_WEBSITE" : "MANUAL_RESEARCH",
         isVerified: farm.isVerified ?? false,
         isClaimed: false,
@@ -268,9 +288,10 @@ async function seedFarms() {
         latitude: farm.latitude,
         longitude: farm.longitude,
         timezone: farm.timezone,
-        phone: farm.phone,
+        phone: farm.phone || null,
         websiteUrl: farm.websiteUrl,
         status: "ACTIVE",
+        reviewStatus: "APPROVED",
         dataSource: farm.isVerified ? "FARM_WEBSITE" : "MANUAL_RESEARCH",
         isVerified: farm.isVerified ?? false,
         isClaimed: false,
@@ -322,7 +343,55 @@ async function seedFarmHours() {
   for (const farm of farms) {
     const farmImport = washingtonFarms.find((candidate) => candidate.slug === farm.slug);
     const hourOverride = farmImport?.hours;
+    const hourWindows = farmImport?.hourWindows || [];
     await prisma.farmHour.deleteMany({ where: { farmId: farm.id } });
+    if (hourWindows.length > 0) {
+      const openDays = new Set(hourWindows.map((window) => window.dayOfWeek));
+      for (const window of hourWindows) {
+        await prisma.farmHour.create({
+          data: {
+            farmId: farm.id,
+            dayOfWeek: window.dayOfWeek,
+            openTime: time(window.openTime),
+            closeTime: time(window.closeTime),
+            isClosed: false,
+            notes: window.notes,
+            effectiveStartDate: date("2026-06-01"),
+            effectiveEndDate: date("2026-10-31"),
+            source: farmImport?.isVerified ? "FARM_WEBSITE" : "MANUAL_RESEARCH",
+            sourceUrl: window.sourceUrl || farmImport?.sourceUrl,
+            verificationMethod: farmImport?.isVerified ? "manual_official_website_review" : "development_seed",
+            isVerified: farmImport?.isVerified ?? false,
+            verifiedAt: farmImport?.lastVerifiedAt ? new Date(farmImport.lastVerifiedAt) : null,
+          },
+        });
+      }
+
+      for (const dayOfWeek of dayNames.filter((day) => !openDays.has(day))) {
+        await prisma.farmHour.create({
+          data: {
+            farmId: farm.id,
+            dayOfWeek,
+            openTime: null,
+            closeTime: null,
+            isClosed: true,
+            notes: "Official U-pick page lists this day as closed or no U-pick window was found.",
+            effectiveStartDate: date("2026-06-01"),
+            effectiveEndDate: date("2026-10-31"),
+            source: farmImport?.isVerified ? "FARM_WEBSITE" : "MANUAL_RESEARCH",
+            sourceUrl: farmImport?.sourceUrl,
+            verificationMethod: farmImport?.isVerified ? "manual_official_website_review" : "development_seed",
+            isVerified: farmImport?.isVerified ?? false,
+            verifiedAt: farmImport?.lastVerifiedAt ? new Date(farmImport.lastVerifiedAt) : null,
+          },
+        });
+      }
+      continue;
+    }
+
+    if (farmImport?.isVerified && !hourOverride) {
+      continue;
+    }
     for (const dayOfWeek of dayNames) {
       const isClosed = hourOverride ? hourOverride.closedDays.includes(dayOfWeek) : dayOfWeek === "MONDAY";
       await prisma.farmHour.create({
@@ -368,7 +437,7 @@ async function seedFarmCrops() {
           peakStartDate: date(season.peakStart),
           peakEndDate: date(season.peakEnd),
           notes: farmImport.cropNotes?.[cropSlug] || "Development seasonal window. Not verified against live farm conditions.",
-          isUPick: true,
+          isUPick: farmImport.uPickCropSlugs?.[cropSlug] ?? true,
           isPrePicked: cropSlug === "pumpkin" || cropSlug === "christmas-tree",
           isActive: true,
         },
@@ -378,7 +447,7 @@ async function seedFarmCrops() {
           peakStartDate: date(season.peakStart),
           peakEndDate: date(season.peakEnd),
           notes: farmImport.cropNotes?.[cropSlug] || "Development seasonal window. Not verified against live farm conditions.",
-          isUPick: true,
+          isUPick: farmImport.uPickCropSlugs?.[cropSlug] ?? true,
           isPrePicked: cropSlug === "pumpkin" || cropSlug === "christmas-tree",
           isActive: true,
         },
@@ -407,7 +476,11 @@ async function seedCropPrices() {
 
   for (const farmCrop of farmCrops) {
     const farmImport = washingtonFarms.find((candidate) => candidate.slug === farmCrop.farm.slug);
-    const price = farmImport?.priceOverrides?.[farmCrop.crop.slug] || priceByCrop[farmCrop.crop.slug];
+    const priceOverride = farmImport?.priceOverrides?.[farmCrop.crop.slug];
+    if (farmImport?.isVerified && !priceOverride) {
+      continue;
+    }
+    const price = priceOverride || priceByCrop[farmCrop.crop.slug];
     await prisma.cropPrice.create({
       data: {
         farmId: farmCrop.farmId,
@@ -420,12 +493,10 @@ async function seedCropPrices() {
         notes: price.notes || "Development price data. Confirm with farm before visiting.",
         effectiveStartDate: farmCrop.seasonStartDate,
         effectiveEndDate: farmCrop.seasonEndDate,
-        source: farmImport?.priceOverrides?.[farmCrop.crop.slug] ? "FARM_WEBSITE" : "MANUAL_RESEARCH",
-        sourceUrl: farmImport?.priceOverrides?.[farmCrop.crop.slug] ? farmImport.sourceUrl : undefined,
-        verificationMethod: farmImport?.priceOverrides?.[farmCrop.crop.slug]
-          ? "manual_official_website_review"
-          : "development_seed",
-        isVerified: Boolean(farmImport?.priceOverrides?.[farmCrop.crop.slug]),
+        source: priceOverride ? "FARM_WEBSITE" : "MANUAL_RESEARCH",
+        sourceUrl: priceOverride ? farmImport?.sourceUrl : undefined,
+        verificationMethod: priceOverride ? "manual_official_website_review" : "development_seed",
+        isVerified: Boolean(priceOverride),
         verifiedAt: farmImport?.lastVerifiedAt ? new Date(farmImport.lastVerifiedAt) : null,
       },
     });
@@ -445,7 +516,9 @@ async function seedPickingReports() {
     const farmImport = washingtonFarms.find((candidate) => candidate.slug === farm.slug);
     const reportInputs =
       farmImport?.currentReports ||
-      (farm.farmCrops[0]
+      (farmImport?.isVerified
+        ? []
+        : farm.farmCrops[0]
         ? [
             {
               cropSlug: farm.farmCrops[0].crop.slug,
@@ -534,9 +607,14 @@ async function seedEvidence() {
 
     await prisma.evidence.deleteMany({ where: { farmId: farm.id } });
 
+    const sourceName = farmImport.sourceName || `${farmImport.name} official website`;
+    const contactSource = farmImport.contactSourceUrl || officialWebsite;
+    const addressSource = farmImport.addressSourceUrl || contactSource;
+    const coordinateSource = farmImport.coordinateSourceUrl || addressSource;
+
     const baseEvidence = {
       farmId: farm.id,
-      sourceName: "Harvold Berry Farm official website",
+      sourceName,
       sourceType: "OFFICIAL_WEBSITE",
       confidenceScore: farmImport.verificationConfidence || 90,
       observedAt,
@@ -553,7 +631,7 @@ async function seedEvidence() {
         normalizedValue: { websiteUrl: farmImport.websiteUrl },
         sourceUrl: officialWebsite,
         expiresAt: evidenceExpiry(30, observedAt),
-        notes: "Official farm website used as the primary source for Gold Standard profile.",
+        notes: "Official farm website used as a primary source for this reference profile.",
       },
       {
         ...baseEvidence,
@@ -570,7 +648,7 @@ async function seedEvidence() {
         fieldName: "phone",
         value: farmImport.phone,
         normalizedValue: { phone: farmImport.phone },
-        sourceUrl: "https://harvoldberryfarm.com/contact-us",
+        sourceUrl: contactSource,
         expiresAt: evidenceExpiry(90, observedAt),
       },
       {
@@ -584,7 +662,7 @@ async function seedEvidence() {
           state: farmImport.state,
           postalCode: farmImport.postalCode,
         },
-        sourceUrl: "https://harvoldberryfarm.com/contact-us",
+        sourceUrl: addressSource,
         expiresAt: evidenceExpiry(180, observedAt),
       },
       {
@@ -593,11 +671,18 @@ async function seedEvidence() {
         fieldName: "coordinates",
         value: `${farmImport.latitude}, ${farmImport.longitude}`,
         normalizedValue: { latitude: farmImport.latitude, longitude: farmImport.longitude },
-        sourceUrl: "https://harvoldberryfarm.com/contact-us",
+        sourceUrl: coordinateSource,
         expiresAt: evidenceExpiry(180, observedAt),
-        confidenceScore: 88,
+        confidenceScore: farmImport.coordinatesConfidence || 88,
       },
     ];
+
+    if (!farmImport.phone) {
+      const phoneIndex = evidenceInputs.findIndex((input) => input.evidenceType === "CONTACT" && input.fieldName === "phone");
+      if (phoneIndex >= 0) {
+        evidenceInputs.splice(phoneIndex, 1);
+      }
+    }
 
     if (farmImport.hours) {
       evidenceInputs.push({
@@ -733,7 +818,7 @@ async function seedVerificationProfiles() {
       where: { farmId: farm.id },
       create: {
         farmId: farm.id,
-        status: farmImport.isVerified ? "GOLD_STANDARD" : "PENDING_REVIEW",
+        status: farmImport.referenceStatus || (farmImport.isVerified ? "GOLD_STANDARD" : "PENDING_REVIEW"),
         lastResearchedAt: farmImport.lastVerifiedAt ? new Date(farmImport.lastVerifiedAt) : null,
         nextReviewAt: farmImport.nextReviewAt ? new Date(farmImport.nextReviewAt) : null,
         confidence: farmImport.verificationConfidence || 0,
@@ -750,7 +835,7 @@ async function seedVerificationProfiles() {
         photoAttribution: farmImport.photoAttribution,
       },
       update: {
-        status: farmImport.isVerified ? "GOLD_STANDARD" : "PENDING_REVIEW",
+        status: farmImport.referenceStatus || (farmImport.isVerified ? "GOLD_STANDARD" : "PENDING_REVIEW"),
         lastResearchedAt: farmImport.lastVerifiedAt ? new Date(farmImport.lastVerifiedAt) : null,
         nextReviewAt: farmImport.nextReviewAt ? new Date(farmImport.nextReviewAt) : null,
         confidence: farmImport.verificationConfidence || 0,

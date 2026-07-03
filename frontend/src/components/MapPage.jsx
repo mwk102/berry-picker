@@ -101,10 +101,9 @@ export function MapPage() {
     const visibleFarms = farmsWithDistance.filter((farm) => {
       const matchesOpenNow = !filters.openNow || farm.status === 'Open'
       const matchesRadius = farm.distanceMiles <= filters.radiusMiles
-      const hasUnknownCandidatePrice =
-        farm.isUnverifiedCandidate && !Number.isFinite(farm.pricePerPound)
+      const hasUnknownPrice = !Number.isFinite(farm.pricePerPound)
       const matchesPrice =
-        hasUnknownCandidatePrice ||
+        hasUnknownPrice ||
         farm.pricePerPound <= filters.maxPricePerPound
 
       return matchesOpenNow && matchesRadius && matchesPrice
