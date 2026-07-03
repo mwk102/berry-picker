@@ -1,0 +1,101 @@
+const express = require('express')
+const { badRequest } = require('../utils/errors')
+
+const EVIDENCE_TYPES = new Set([
+  'PRICE',
+  'HOURS',
+  'CROP_AVAILABILITY',
+  'HARVEST_STATUS',
+  'AMENITY',
+  'ANNOUNCEMENT',
+  'CONTACT',
+  'LOCATION',
+  'PHOTO',
+  'GENERAL',
+])
+
+const SOURCE_TYPES = new Set([
+  'OFFICIAL_WEBSITE',
+  'FARM_OWNER',
+  'ADMIN_RESEARCH',
+  'COMMUNITY_REPORT',
+  'GOOGLE_PLACES',
+  'OPENSTREETMAP',
+  'SOCIAL_MEDIA',
+  'IMPORT',
+])
+
+function validateUuid(value, fieldName) {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value || '')) {
+    throw badRequest(`${fieldName} must be a UUID`)
+  }
+}
+
+function validateEvidenceBody(farmId, body) {
+  validateUuid(farmId, 'farmId')
+
+  if (!EVIDENCE_TYPES.has(body.evidenceType)) {
+    throw badRequest('evidenceType is invalid')
+  }
+  if (!SOURCE_TYPES.has(body.sourceType)) {
+    throw badRequest('sourceType is invalid')
+  }
+  if (body.confidenceScore !== undefined) {
+    const score = Number(body.confidenceScore)
+    if (!Number.isInteger(score) || score < 0 || score > 100) {
+      throw badRequest('confidenceScore must be an integer between 0 and 100')
+    }
+  }
+  if (body.farmCropId) validateUuid(body.farmCropId, 'farmCropId')
+  if (body.cropId) validateUuid(body.cropId, 'cropId')
+
+  return {
+    ...body,
+    farmId,
+  }
+}
+
+function createAdminEvidenceRouter(evidenceService) {
+  const router = express.Router()
+
+  // TODO(auth-required): protect all admin evidence routes before production.
+  router.get('/farms/:farmId/evidence', async (req, res, next) => {
+    try {
+      validateUuid(req.params.farmId, 'farmId')
+      res.json(await evidenceService.listEvidenceForFarm(req.params.farmId))
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  // TODO(auth-required): restrict evidence creation to trusted admins/reviewers.
+  router.post('/farms/:farmId/evidence', async (req, res, next) => {
+    try {
+      const input = validateEvidenceBody(req.params.farmId, req.body)
+      const result = await evidenceService.createEvidence(input)
+      res.status(201).json(result)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  router.get('/evidence/expired', async (_req, res, next) => {
+    try {
+      res.json(await evidenceService.findExpiredEvidence())
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  router.get('/evidence/low-confidence', async (req, res, next) => {
+    try {
+      res.json(await evidenceService.findLowConfidenceEvidence(req.query.threshold || 70))
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  return router
+}
+
+module.exports = { createAdminEvidenceRouter }

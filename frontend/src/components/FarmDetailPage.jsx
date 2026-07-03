@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { EmptyState } from './EmptyState'
+import { EvidencePanel } from './EvidencePanel'
 import { FarmAmenitiesGrid } from './FarmAmenitiesGrid'
 import { FarmAnnouncements } from './FarmAnnouncements'
 import { FarmConfidencePanel } from './FarmConfidencePanel'
@@ -142,6 +143,7 @@ export function FarmDetailPage() {
         <FarmReportsList reports={farm.pickingReports || []} />
         <FarmAnnouncements announcements={farm.announcements || []} />
         <NearbyFarms farms={farm.nearbyFarms || []} />
+        <EvidencePanel evidence={farm.evidence || []} />
       </div>
     </div>
   )

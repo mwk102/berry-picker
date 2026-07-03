@@ -140,6 +140,30 @@ enum FarmVerificationStatus {
   NEEDS_REVIEW
 }
 
+enum EvidenceType {
+  PRICE
+  HOURS
+  CROP_AVAILABILITY
+  HARVEST_STATUS
+  AMENITY
+  ANNOUNCEMENT
+  CONTACT
+  LOCATION
+  PHOTO
+  GENERAL
+}
+
+enum EvidenceSourceType {
+  OFFICIAL_WEBSITE
+  FARM_OWNER
+  ADMIN_RESEARCH
+  COMMUNITY_REPORT
+  GOOGLE_PLACES
+  OPENSTREETMAP
+  SOCIAL_MEDIA
+  IMPORT
+}
+
 model User {
   id           String   @id @default(uuid()) @db.Uuid
   name         String?
@@ -198,6 +222,7 @@ model Farm {
   sources       FarmSource[]
   candidates    CandidateFarm[]
   verification  FarmVerificationProfile?
+  evidence      Evidence[]
 
   @@index([city])
   @@index([state])
@@ -235,6 +260,44 @@ model FarmVerificationProfile {
   @@index([lastResearchedAt])
   @@index([nextReviewAt])
   @@index([completenessScore])
+}
+
+model Evidence {
+  id                 String             @id @default(uuid()) @db.Uuid
+  farmId             String             @db.Uuid
+  farmCropId         String?            @db.Uuid
+  cropId             String?            @db.Uuid
+  evidenceType       EvidenceType
+  fieldName          String
+  value              String
+  normalizedValue    Json?
+  sourceName         String
+  sourceUrl          String
+  sourceType         EvidenceSourceType
+  confidenceScore    Int                @default(0)
+  observedAt         DateTime
+  verifiedAt         DateTime?
+  expiresAt          DateTime?
+  verificationMethod String
+  notes              String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  farm     Farm      @relation(fields: [farmId], references: [id], onDelete: Restrict)
+  farmCrop FarmCrop? @relation(fields: [farmCropId], references: [id], onDelete: SetNull)
+  crop     Crop?     @relation(fields: [cropId], references: [id], onDelete: SetNull)
+
+  @@index([farmId])
+  @@index([farmCropId])
+  @@index([cropId])
+  @@index([evidenceType])
+  @@index([fieldName])
+  @@index([sourceType])
+  @@index([confidenceScore])
+  @@index([expiresAt])
+  @@index([verifiedAt])
+  @@index([farmId, evidenceType])
+  @@index([farmId, fieldName])
 }
 
 model FarmSource {
@@ -301,6 +364,7 @@ model Crop {
   cropPrices     CropPrice[]
   reports        PickingReport[]
   harvestSummary HarvestSummary?
+  evidence       Evidence[]
 
   @@index([category])
   @@index([isActive])
@@ -343,10 +407,11 @@ model FarmCrop {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  farm    Farm            @relation(fields: [farmId], references: [id], onDelete: Restrict)
-  crop    Crop            @relation(fields: [cropId], references: [id], onDelete: Restrict)
-  prices  CropPrice[]
-  reports PickingReport[]
+  farm     Farm            @relation(fields: [farmId], references: [id], onDelete: Restrict)
+  crop     Crop            @relation(fields: [cropId], references: [id], onDelete: Restrict)
+  prices   CropPrice[]
+  reports  PickingReport[]
+  evidence Evidence[]
 
   @@unique([farmId, cropId])
   @@index([farmId, isActive])

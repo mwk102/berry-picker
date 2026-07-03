@@ -7,7 +7,9 @@ import { PrismaClient } from "@prisma/client";
 
 const require = createRequire(import.meta.url);
 const { createHarvestRepository } = require("../src/repositories/harvestRepository");
+const { createEvidenceRepository } = require("../src/repositories/evidenceRepository");
 const { createHarvestRadarService } = require("../src/services/harvestRadarService");
+const { createEvidenceService } = require("../src/services/evidenceService");
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -17,6 +19,8 @@ if (!connectionString) {
 
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
+const evidenceRepository = createEvidenceRepository(prisma);
+const evidenceService = createEvidenceService(evidenceRepository);
 
 const crops = [
   { slug: "blueberry", name: "Blueberry", category: "BERRY", defaultSeasonStartMonth: 7, defaultSeasonEndMonth: 9, icon: "blueberry", color: "#3f5fb8" },
@@ -143,6 +147,7 @@ const summary = {
   announcements: 0,
   harvestSummaries: 0,
   verificationProfiles: 0,
+  evidence: 0,
 };
 
 function date(value: string) {
@@ -509,13 +514,219 @@ async function seedAnnouncements() {
   }
 }
 
+function evidenceExpiry(daysFromObserved: number, observedAt: string) {
+  const expiresAt = new Date(observedAt);
+  expiresAt.setUTCDate(expiresAt.getUTCDate() + daysFromObserved);
+  return expiresAt.toISOString();
+}
+
+async function seedEvidence() {
+  for (const farmImport of washingtonFarms.filter((farm) => farm.isVerified)) {
+    const farm = await prisma.farm.findUniqueOrThrow({
+      where: { slug: farmImport.slug },
+      include: { farmCrops: { include: { crop: true } } },
+    });
+    const observedAt = farmImport.lastVerifiedAt || new Date().toISOString();
+    const verifiedAt = farmImport.lastVerifiedAt || observedAt;
+    const officialWebsite = farmImport.sourceUrls?.[0] || farmImport.websiteUrl;
+    const locationSource = farmImport.sourceUrl || officialWebsite;
+    const homepageSource = farmImport.announcementSourceUrl || officialWebsite;
+
+    await prisma.evidence.deleteMany({ where: { farmId: farm.id } });
+
+    const baseEvidence = {
+      farmId: farm.id,
+      sourceName: "Harvold Berry Farm official website",
+      sourceType: "OFFICIAL_WEBSITE",
+      confidenceScore: farmImport.verificationConfidence || 90,
+      observedAt,
+      verifiedAt,
+      verificationMethod: "manual_official_website_review",
+    };
+
+    const evidenceInputs = [
+      {
+        ...baseEvidence,
+        evidenceType: "GENERAL",
+        fieldName: "officialWebsite",
+        value: farmImport.websiteUrl,
+        normalizedValue: { websiteUrl: farmImport.websiteUrl },
+        sourceUrl: officialWebsite,
+        expiresAt: evidenceExpiry(30, observedAt),
+        notes: "Official farm website used as the primary source for Gold Standard profile.",
+      },
+      {
+        ...baseEvidence,
+        evidenceType: "CONTACT",
+        fieldName: "websiteUrl",
+        value: farmImport.websiteUrl,
+        normalizedValue: { websiteUrl: farmImport.websiteUrl },
+        sourceUrl: officialWebsite,
+        expiresAt: evidenceExpiry(90, observedAt),
+      },
+      {
+        ...baseEvidence,
+        evidenceType: "CONTACT",
+        fieldName: "phone",
+        value: farmImport.phone,
+        normalizedValue: { phone: farmImport.phone },
+        sourceUrl: "https://harvoldberryfarm.com/contact-us",
+        expiresAt: evidenceExpiry(90, observedAt),
+      },
+      {
+        ...baseEvidence,
+        evidenceType: "LOCATION",
+        fieldName: "address",
+        value: farmImport.addressLine1 || `${farmImport.city}, ${farmImport.state}`,
+        normalizedValue: {
+          addressLine1: farmImport.addressLine1,
+          city: farmImport.city,
+          state: farmImport.state,
+          postalCode: farmImport.postalCode,
+        },
+        sourceUrl: "https://harvoldberryfarm.com/contact-us",
+        expiresAt: evidenceExpiry(180, observedAt),
+      },
+      {
+        ...baseEvidence,
+        evidenceType: "LOCATION",
+        fieldName: "coordinates",
+        value: `${farmImport.latitude}, ${farmImport.longitude}`,
+        normalizedValue: { latitude: farmImport.latitude, longitude: farmImport.longitude },
+        sourceUrl: "https://harvoldberryfarm.com/contact-us",
+        expiresAt: evidenceExpiry(180, observedAt),
+        confidenceScore: 88,
+      },
+    ];
+
+    if (farmImport.hours) {
+      evidenceInputs.push({
+        ...baseEvidence,
+        evidenceType: "HOURS",
+        fieldName: "hours",
+        value: farmImport.hours.notes,
+        normalizedValue: {
+          openDays: farmImport.hours.openDays,
+          openTime: farmImport.hours.openTime,
+          closeTime: farmImport.hours.closeTime,
+          closedDays: farmImport.hours.closedDays,
+        },
+        sourceUrl: farmImport.hours.sourceUrl || homepageSource,
+        expiresAt: evidenceExpiry(7, observedAt),
+      });
+    }
+
+    for (const [cropSlug, fieldLocation] of Object.entries(farmImport.fieldLocations || {})) {
+      const farmCrop = farm.farmCrops.find((candidate) => candidate.crop.slug === cropSlug);
+      if (!farmCrop) continue;
+
+      evidenceInputs.push({
+        ...baseEvidence,
+        farmCropId: farmCrop.id,
+        cropId: farmCrop.cropId,
+        evidenceType: "CROP_AVAILABILITY",
+        fieldName: "cropAvailability",
+        value: `${farmCrop.crop.name} listed at ${fieldLocation}`,
+        normalizedValue: {
+          cropSlug,
+          cropName: farmCrop.crop.name,
+          fieldLocation,
+        },
+        sourceUrl: locationSource,
+        expiresAt: evidenceExpiry(14, observedAt),
+      });
+    }
+
+    for (const [cropSlug, price] of Object.entries(farmImport.priceOverrides || {})) {
+      const farmCrop = farm.farmCrops.find((candidate) => candidate.crop.slug === cropSlug);
+      if (!farmCrop) continue;
+
+      evidenceInputs.push({
+        ...baseEvidence,
+        farmCropId: farmCrop.id,
+        cropId: farmCrop.cropId,
+        evidenceType: "PRICE",
+        fieldName: "price",
+        value: `${farmCrop.crop.name}: $${price.amount}/${price.unitLabel}`,
+        normalizedValue: {
+          cropSlug,
+          amount: price.amount,
+          unitLabel: price.unitLabel,
+          priceType: price.priceType,
+        },
+        sourceUrl: locationSource,
+        expiresAt: evidenceExpiry(14, observedAt),
+        notes: price.notes,
+      });
+    }
+
+    for (const report of farmImport.currentReports || []) {
+      const farmCrop = farm.farmCrops.find((candidate) => candidate.crop.slug === report.cropSlug);
+      if (!farmCrop) continue;
+
+      evidenceInputs.push({
+        ...baseEvidence,
+        farmCropId: farmCrop.id,
+        cropId: farmCrop.cropId,
+        evidenceType: "HARVEST_STATUS",
+        fieldName: "harvestStatus",
+        value: report.comment,
+        normalizedValue: {
+          cropSlug: report.cropSlug,
+          condition: report.condition,
+          crowdLevel: report.crowdLevel,
+          rating: report.rating,
+        },
+        sourceUrl: report.sourceUrl || homepageSource,
+        expiresAt: evidenceExpiry(3, observedAt),
+      });
+    }
+
+    if (farmImport.announcement) {
+      evidenceInputs.push({
+        ...baseEvidence,
+        evidenceType: "ANNOUNCEMENT",
+        fieldName: "announcement",
+        value: farmImport.announcement,
+        normalizedValue: { announcement: farmImport.announcement },
+        sourceUrl: farmImport.announcementSourceUrl || homepageSource,
+        expiresAt: evidenceExpiry(7, observedAt),
+      });
+    }
+
+    if (farmImport.amenitySlugs.length > 0) {
+      evidenceInputs.push({
+        ...baseEvidence,
+        evidenceType: "AMENITY",
+        fieldName: "amenity",
+        value: farmImport.amenitySlugs.join(", "),
+        normalizedValue: { amenitySlugs: farmImport.amenitySlugs },
+        sourceUrl: officialWebsite,
+        expiresAt: evidenceExpiry(90, observedAt),
+        confidenceScore: 62,
+        notes: "Amenities remain lower-confidence until each amenity is confirmed from official source text or owner review.",
+      });
+    }
+
+    for (const evidenceInput of evidenceInputs) {
+      await evidenceService.createEvidence(evidenceInput);
+      summary.evidence += 1;
+    }
+  }
+}
+
 async function seedVerificationProfiles() {
   for (const farmImport of washingtonFarms) {
     if (!farmImport.isVerified && !farmImport.verificationConfidence) continue;
 
     const farm = await prisma.farm.findUniqueOrThrow({ where: { slug: farmImport.slug } });
-    const completeness = buildCompleteness(farmImport);
-    const lowConfidenceFields = buildLowConfidenceFields(farmImport);
+    const evidence = await prisma.evidence.findMany({ where: { farmId: farm.id } });
+    const evidenceSummary = evidenceService.summarizeEvidenceForFarm(evidence);
+    const fallbackCompleteness = buildCompleteness(farmImport);
+    const fallbackLowConfidenceFields = buildLowConfidenceFields(farmImport);
+    const completeness = evidence.length > 0 ? evidenceSummary : fallbackCompleteness;
+    const lowConfidenceFields =
+      evidence.length > 0 ? evidenceSummary.lowConfidenceFields : fallbackLowConfidenceFields;
     const sourceUrls = farmImport.sourceUrls || (farmImport.sourceUrl ? [farmImport.sourceUrl] : []);
 
     await prisma.farmVerificationProfile.upsert({
@@ -526,12 +737,12 @@ async function seedVerificationProfiles() {
         lastResearchedAt: farmImport.lastVerifiedAt ? new Date(farmImport.lastVerifiedAt) : null,
         nextReviewAt: farmImport.nextReviewAt ? new Date(farmImport.nextReviewAt) : null,
         confidence: farmImport.verificationConfidence || 0,
-        sourceCount: sourceUrls.length,
+        sourceCount: evidence.length > 0 ? evidenceSummary.sourceCount : sourceUrls.length,
         sourceUrls,
         manualNotes: farmImport.manualNotes,
-        completenessScore: completeness.score,
-        completenessJson: completeness.checks,
-        missingFieldsJson: completeness.missingFields,
+        completenessScore: evidence.length > 0 ? evidenceSummary.completenessScore : completeness.score,
+        completenessJson: evidence.length > 0 ? evidenceSummary.completeness : completeness.checks,
+        missingFieldsJson: evidence.length > 0 ? evidenceSummary.missingFields : completeness.missingFields,
         lowConfidenceJson: lowConfidenceFields,
         personalityJson: farmImport.personality || null,
         heroImageUrl: farmImport.heroImageUrl || null,
@@ -543,12 +754,12 @@ async function seedVerificationProfiles() {
         lastResearchedAt: farmImport.lastVerifiedAt ? new Date(farmImport.lastVerifiedAt) : null,
         nextReviewAt: farmImport.nextReviewAt ? new Date(farmImport.nextReviewAt) : null,
         confidence: farmImport.verificationConfidence || 0,
-        sourceCount: sourceUrls.length,
+        sourceCount: evidence.length > 0 ? evidenceSummary.sourceCount : sourceUrls.length,
         sourceUrls,
         manualNotes: farmImport.manualNotes,
-        completenessScore: completeness.score,
-        completenessJson: completeness.checks,
-        missingFieldsJson: completeness.missingFields,
+        completenessScore: evidence.length > 0 ? evidenceSummary.completenessScore : completeness.score,
+        completenessJson: evidence.length > 0 ? evidenceSummary.completeness : completeness.checks,
+        missingFieldsJson: evidence.length > 0 ? evidenceSummary.missingFields : completeness.missingFields,
         lowConfidenceJson: lowConfidenceFields,
         personalityJson: farmImport.personality || null,
         heroImageUrl: farmImport.heroImageUrl || null,
@@ -576,6 +787,7 @@ async function main() {
   await seedCropPrices();
   await seedPickingReports();
   await seedAnnouncements();
+  await seedEvidence();
   await seedVerificationProfiles();
   await seedHarvestSummaries();
 
@@ -588,6 +800,7 @@ async function main() {
     "prices created/updated": summary.prices,
     "reports created/updated": summary.reports,
     "announcements created/updated": summary.announcements,
+    "evidence created/updated": summary.evidence,
     "verification profiles created/updated": summary.verificationProfiles,
     "harvest summaries recalculated": summary.harvestSummaries,
   });

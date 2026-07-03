@@ -79,6 +79,38 @@ function serializePickingReport(report) {
   }
 }
 
+function serializeEvidence(evidence, now = new Date()) {
+  const isExpired = evidence.expiresAt ? new Date(evidence.expiresAt) < now : false
+  const isStale =
+    !isExpired &&
+    evidence.expiresAt &&
+    new Date(evidence.expiresAt).getTime() - now.getTime() < 1000 * 60 * 60 * 24 * 7
+  const isLowConfidence = evidence.confidenceScore < 70
+
+  return {
+    id: evidence.id,
+    farmId: evidence.farmId,
+    farmCropId: evidence.farmCropId,
+    cropId: evidence.cropId,
+    evidenceType: evidence.evidenceType,
+    fieldName: evidence.fieldName,
+    value: evidence.value,
+    normalizedValue: evidence.normalizedValue,
+    sourceName: evidence.sourceName,
+    sourceUrl: evidence.sourceUrl,
+    sourceType: evidence.sourceType,
+    confidenceScore: evidence.confidenceScore,
+    observedAt: evidence.observedAt,
+    verifiedAt: evidence.verifiedAt,
+    expiresAt: evidence.expiresAt,
+    verificationMethod: evidence.verificationMethod,
+    notes: evidence.notes,
+    status: isExpired ? 'expired' : isLowConfidence ? 'low confidence' : isStale ? 'stale' : 'fresh',
+    createdAt: evidence.createdAt,
+    updatedAt: evidence.updatedAt,
+  }
+}
+
 function serializeFarm(farm) {
   return {
     id: farm.id,
@@ -156,6 +188,7 @@ function serializeFarm(farm) {
           updatedAt: farm.verification.updatedAt,
         }
       : null,
+    evidence: farm.evidence ? farm.evidence.map((evidence) => serializeEvidence(evidence)) : [],
     candidateReview: farm.candidates?.[0]
       ? {
           id: farm.candidates[0].id,
@@ -184,4 +217,4 @@ function serializeCrop(crop) {
   }
 }
 
-module.exports = { serializeCrop, serializeFarm }
+module.exports = { serializeCrop, serializeEvidence, serializeFarm }

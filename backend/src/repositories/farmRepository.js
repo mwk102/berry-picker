@@ -46,6 +46,9 @@ function createFarmInclude(now = new Date()) {
     orderBy: { importedAt: 'desc' },
   },
   verification: true,
+  evidence: {
+    orderBy: [{ evidenceType: 'asc' }, { observedAt: 'desc' }],
+  },
   candidates: {
     orderBy: { updatedAt: 'desc' },
     take: 1,
