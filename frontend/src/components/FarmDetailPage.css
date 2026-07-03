@@ -627,6 +627,32 @@
   color: var(--color-forest-900);
 }
 
+.timeline-row-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.timeline-row-header > span {
+  display: grid;
+  gap: 3px;
+}
+
+.timeline-row-header em {
+  width: fit-content;
+  border-radius: var(--radius-pill);
+  background: var(--color-mint-100);
+  color: var(--color-leaf-700);
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 950;
+  padding: 6px 9px;
+  text-align: right;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 .harvest-timeline-row span,
 .nearby-farm-row span {
   color: var(--color-muted);
@@ -641,6 +667,64 @@
   background: linear-gradient(90deg, #dfeee0, #b7d968, #f2d487);
 }
 
+.harvest-timeline-row.upcoming .timeline-track {
+  background: linear-gradient(90deg, #eef4eb, #e3efd4, #d6e6bf);
+}
+
+.harvest-timeline-row.upcoming .timeline-track::after {
+  position: absolute;
+  left: 12px;
+  top: -3px;
+  border-radius: var(--radius-pill);
+  background: var(--color-forest-900);
+  color: white;
+  content: 'Not available yet';
+  font-size: 0.72rem;
+  font-weight: 950;
+  padding: 5px 8px;
+}
+
+.harvest-timeline-row.upcoming .timeline-row-header em {
+  background: #eef2ef;
+  color: #526159;
+}
+
+.harvest-timeline-row.unavailable .timeline-track,
+.harvest-timeline-row.unknown .timeline-track {
+  border: 1px dashed rgba(82, 97, 89, 0.28);
+  background: repeating-linear-gradient(
+    135deg,
+    #f5f7f5,
+    #f5f7f5 8px,
+    #edf1ed 8px,
+    #edf1ed 16px
+  );
+}
+
+.harvest-timeline-row.unavailable .timeline-track::after,
+.harvest-timeline-row.unknown .timeline-track::after {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--color-muted);
+  content: 'No current harvest';
+  font-size: 0.78rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.harvest-timeline-row.unknown .timeline-track::after {
+  content: 'Schedule unknown';
+}
+
+.harvest-timeline-row.unavailable .timeline-row-header em,
+.harvest-timeline-row.unknown .timeline-row-header em {
+  background: #eef2ef;
+  color: #526159;
+}
+
 .timeline-track::before {
   position: absolute;
   right: 14px;
@@ -649,6 +733,11 @@
   height: 2px;
   background: rgba(16, 37, 26, 0.32);
   content: '';
+}
+
+.harvest-timeline-row.unavailable .timeline-track::before,
+.harvest-timeline-row.unknown .timeline-track::before {
+  display: none;
 }
 
 .timeline-track i {
