@@ -247,10 +247,12 @@ async function seedFarms() {
         ],
       },
     },
-    data: { isActive: false },
+    data: { isActive: false, reviewStatus: "PENDING_REVIEW" },
   });
 
   for (const farm of washingtonFarms) {
+    const isReferenceFarm = farm.isVerified ?? false;
+
     await prisma.farm.upsert({
       where: { slug: farm.slug },
       create: {
@@ -269,11 +271,11 @@ async function seedFarms() {
         phone: farm.phone || null,
         websiteUrl: farm.websiteUrl,
         status: "ACTIVE",
-        reviewStatus: "APPROVED",
+        reviewStatus: isReferenceFarm ? "APPROVED" : "PENDING_REVIEW",
         dataSource: farm.isVerified ? "FARM_WEBSITE" : "MANUAL_RESEARCH",
         isVerified: farm.isVerified ?? false,
         isClaimed: false,
-        isActive: true,
+        isActive: isReferenceFarm,
         lastVerifiedAt: farm.lastVerifiedAt ? new Date(farm.lastVerifiedAt) : null,
       },
       update: {
@@ -291,11 +293,11 @@ async function seedFarms() {
         phone: farm.phone || null,
         websiteUrl: farm.websiteUrl,
         status: "ACTIVE",
-        reviewStatus: "APPROVED",
+        reviewStatus: isReferenceFarm ? "APPROVED" : "PENDING_REVIEW",
         dataSource: farm.isVerified ? "FARM_WEBSITE" : "MANUAL_RESEARCH",
         isVerified: farm.isVerified ?? false,
         isClaimed: false,
-        isActive: true,
+        isActive: isReferenceFarm,
         lastVerifiedAt: farm.lastVerifiedAt ? new Date(farm.lastVerifiedAt) : null,
       },
     });

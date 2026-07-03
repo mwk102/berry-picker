@@ -360,7 +360,7 @@
   grid-template-columns: 0.7fr 1fr;
 }
 
-.farm-meta-grid span {
+.farm-meta-grid > span {
   display: grid;
   color: var(--color-muted);
   font-size: 0.82rem;
@@ -372,6 +372,51 @@
   font-size: 0.73rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+.farm-price-summary {
+  color: var(--color-muted);
+  font-size: 0.82rem;
+}
+
+.finder-price-list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.finder-price-chip {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  border: 1px solid rgba(47, 111, 70, 0.14);
+  border-radius: var(--radius-md);
+  background: var(--color-mint-50);
+  color: var(--color-forest-800);
+  font-size: 0.82rem;
+  padding: 8px 10px;
+}
+
+.finder-price-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.finder-price-chip strong {
+  flex: 0 0 auto;
+  color: var(--color-forest-900);
+  font-size: 0.8rem;
+}
+
+.finder-price-chip.unavailable {
+  background: #f7f9f7;
+  color: var(--color-muted);
+}
+
+.finder-price-chip.unavailable strong {
+  color: var(--color-muted);
 }
 
 .empty-state {

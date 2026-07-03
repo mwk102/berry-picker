@@ -113,6 +113,41 @@
   padding-inline: 9px;
 }
 
+.popup-price-list {
+  display: grid;
+  gap: 5px;
+}
+
+.popup-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-radius: 8px;
+  background: var(--color-mint-50);
+  color: var(--color-forest-800);
+  font-size: 0.82rem;
+  padding: 6px 8px;
+}
+
+.popup-price-row span,
+.popup-price-row strong {
+  font-size: 0.82rem;
+}
+
+.popup-price-row strong {
+  color: var(--color-forest-900);
+}
+
+.popup-price-row.unavailable {
+  background: #f7f9f7;
+}
+
+.popup-price-row.unavailable span,
+.popup-price-row.unavailable strong {
+  color: var(--color-muted);
+}
+
 @media (max-width: 900px) {
   .farm-map {
     height: 58svh;

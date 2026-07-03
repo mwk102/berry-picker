@@ -151,7 +151,17 @@ export function FarmMap({ farms = [], onSelectFarm, selectedFarm }) {
                     <BerryChip key={berryType}>{berryType}</BerryChip>
                   ))}
                 </div>
-                <span>{farm.priceLabel}</span>
+                <div className="popup-price-list" aria-label={`${farm.name} crop prices`}>
+                  {farm.cropPriceRows.slice(0, 4).map((priceRow) => (
+                    <span
+                      className={priceRow.hasPrice ? 'popup-price-row' : 'popup-price-row unavailable'}
+                      key={priceRow.cropSlug || priceRow.cropName}
+                    >
+                      <span>{priceRow.cropName}</span>
+                      <strong>{priceRow.label}</strong>
+                    </span>
+                  ))}
+                </div>
                 <span>{farm.city}</span>
                 {farm.website ? (
                   <a href={farm.website} rel="noreferrer" target="_blank">

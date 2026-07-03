@@ -50,13 +50,24 @@ export function FarmCard({ farm, isSelected, onSelect }) {
 
         <span className="farm-meta-grid">
           <span>
-            <strong>Price</strong>
-            {farm.priceLabel}
+            <strong>Prices</strong>
+            <span className="farm-price-summary">{farm.priceSummaryLabel}</span>
           </span>
           <span>
             <strong>Season</strong>
             {farm.season}
           </span>
+        </span>
+        <span className="finder-price-list" aria-label={`${farm.name} crop prices`}>
+          {farm.cropPriceRows.slice(0, 3).map((priceRow) => (
+            <span
+              className={priceRow.hasPrice ? 'finder-price-chip' : 'finder-price-chip unavailable'}
+              key={priceRow.cropSlug || priceRow.cropName}
+            >
+              <span>{priceRow.cropName}</span>
+              <strong>{priceRow.label}</strong>
+            </span>
+          ))}
         </span>
       </button>
       <Link className="farm-card-details-link" to={`/farms/${farm.slug}`}>

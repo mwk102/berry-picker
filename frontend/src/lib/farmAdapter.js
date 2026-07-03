@@ -29,6 +29,15 @@ function formatDateRange(startDate, endDate) {
   return start === end ? start : `${start} - ${end}`
 }
 
+function formatPrice(price) {
+  if (!price || typeof price.amount !== 'number') {
+    return 'Price unavailable'
+  }
+
+  const unit = price.unitLabel ? `/${price.unitLabel}` : ''
+  return `$${price.amount.toFixed(2)}${unit}`
+}
+
 function getCurrentDayOfWeek() {
   return new Intl.DateTimeFormat('en-US', {
     weekday: 'long',
@@ -57,6 +66,26 @@ function deriveOpenStatus(farm) {
   return 'Open'
 }
 
+function getCropPriceRows(farm) {
+  return (farm.crops || []).map((farmCrop) => {
+    const prices = [...(farmCrop.prices || [])].filter(
+      (price) => typeof price.amount === 'number',
+    )
+    const lowestPrice = prices.reduce(
+      (lowest, price) => (!lowest || price.amount < lowest.amount ? price : lowest),
+      null,
+    )
+
+    return {
+      cropSlug: farmCrop.crop?.slug,
+      cropName: farmCrop.crop?.name || 'Crop',
+      hasPrice: Boolean(lowestPrice),
+      label: formatPrice(lowestPrice),
+      price: lowestPrice,
+    }
+  })
+}
+
 function getPrimaryPrice(farm) {
   const prices = farm.prices || farm.crops?.flatMap((farmCrop) => farmCrop.prices || []) || []
   const usablePrices = prices.filter((price) => typeof price.amount === 'number')
@@ -79,6 +108,25 @@ function getPrimaryPrice(farm) {
   }
 }
 
+function getPriceSummary(cropPriceRows) {
+  const pricedRows = cropPriceRows.filter((row) => row.hasPrice)
+  const unavailableCount = cropPriceRows.length - pricedRows.length
+
+  if (pricedRows.length === 0) {
+    return 'Price unavailable'
+  }
+
+  if (pricedRows.length === 1 && unavailableCount === 0) {
+    return `${pricedRows[0].cropName}: ${pricedRows[0].label}`
+  }
+
+  if (unavailableCount > 0) {
+    return `${pricedRows.length} price${pricedRows.length === 1 ? '' : 's'} listed, ${unavailableCount} unavailable`
+  }
+
+  return `${pricedRows.length} prices listed`
+}
+
 export function normalizeFarm(apiFarm) {
   const berryTypes = apiFarm.crops?.map((farmCrop) => farmCrop.crop?.name).filter(Boolean) || []
   const cropSlugs = apiFarm.crops?.map((farmCrop) => farmCrop.crop?.slug).filter(Boolean) || []
@@ -92,6 +140,7 @@ export function normalizeFarm(apiFarm) {
     .sort()
     .at(-1)
   const price = getPrimaryPrice(apiFarm)
+  const cropPriceRows = getCropPriceRows(apiFarm)
   const isUnverifiedCandidate =
     apiFarm.reviewStatus === 'PENDING_REVIEW' ||
     (apiFarm.isVerified === false && apiFarm.dataSource !== 'MANUAL_RESEARCH')
@@ -107,6 +156,8 @@ export function normalizeFarm(apiFarm) {
     website: apiFarm.websiteUrl,
     isUnverifiedCandidate,
     sourceLabel: formatDataSource(apiFarm.dataSource),
+    cropPriceRows,
+    priceSummaryLabel: getPriceSummary(cropPriceRows),
     ...price,
   }
 }
