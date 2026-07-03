@@ -1,5 +1,6 @@
 import L from 'leaflet'
 import { useEffect, useMemo, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import {
   MapContainer,
   Marker,
@@ -157,6 +158,7 @@ export function FarmMap({ farms = [], onSelectFarm, selectedFarm }) {
                     Website
                   </a>
                 ) : null}
+                <Link to={`/farms/${farm.slug}`}>View details</Link>
                   </>
                 )}
               </div>

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { formatDistance } from '../utils/distance'
 import { BerryChip } from './BerryChip'
 import { StatusBadge } from './StatusBadge'
@@ -58,6 +59,9 @@ export function FarmCard({ farm, isSelected, onSelect }) {
           </span>
         </span>
       </button>
+      <Link className="farm-card-details-link" to={`/farms/${farm.slug}`}>
+        View details
+      </Link>
     </article>
   )
 }

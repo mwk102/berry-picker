@@ -153,6 +153,8 @@
 }
 
 .farm-card {
+  display: grid;
+  gap: var(--space-2);
   border-radius: var(--radius-lg);
 }
 
@@ -189,6 +191,32 @@
     linear-gradient(90deg, rgba(183, 217, 104, 0.16), transparent 42%),
     linear-gradient(180deg, white, var(--color-mint-50));
   border-color: var(--color-leaf-600);
+}
+
+.farm-card-details-link {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--color-leaf-700);
+  font-size: 0.86rem;
+  font-weight: 950;
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.farm-card-details-link:hover,
+.farm-card-details-link:focus-visible {
+  border-color: rgba(47, 111, 70, 0.6);
+  box-shadow: var(--shadow-card);
+  outline: none;
+  transform: translateY(-1px);
 }
 
 .farm-card.unverified .farm-card-button {
