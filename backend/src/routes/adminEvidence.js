@@ -17,6 +17,7 @@ const EVIDENCE_TYPES = new Set([
 const SOURCE_TYPES = new Set([
   'OFFICIAL_WEBSITE',
   'FARM_OWNER',
+  'FIELD_OBSERVATION',
   'ADMIN_RESEARCH',
   'COMMUNITY_REPORT',
   'GOOGLE_PLACES',
@@ -24,6 +25,19 @@ const SOURCE_TYPES = new Set([
   'SOCIAL_MEDIA',
   'IMPORT',
 ])
+
+const PICKING_CONDITIONS = new Set([
+  'EXCELLENT',
+  'GOOD',
+  'LIMITED',
+  'PICKED_OVER',
+  'CLOSED',
+  'COMING_SOON',
+  'SEASON_OVER',
+  'UNKNOWN',
+])
+
+const CROWD_LEVELS = new Set(['QUIET', 'MODERATE', 'BUSY', 'VERY_BUSY', 'UNKNOWN'])
 
 function validateUuid(value, fieldName) {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value || '')) {
@@ -55,6 +69,29 @@ function validateEvidenceBody(farmId, body) {
   }
 }
 
+function validateFieldObservationBody(farmId, body) {
+  validateUuid(farmId, 'farmId')
+  validateUuid(body.farmCropId, 'farmCropId')
+
+  if (!PICKING_CONDITIONS.has(body.condition)) {
+    throw badRequest('condition is invalid')
+  }
+  if (body.crowdLevel && !CROWD_LEVELS.has(body.crowdLevel)) {
+    throw badRequest('crowdLevel is invalid')
+  }
+  if (body.confidenceScore !== undefined) {
+    const score = Number(body.confidenceScore)
+    if (!Number.isInteger(score) || score < 0 || score > 100) {
+      throw badRequest('confidenceScore must be an integer between 0 and 100')
+    }
+  }
+
+  return {
+    ...body,
+    farmId,
+  }
+}
+
 function createAdminEvidenceRouter(evidenceService) {
   const router = express.Router()
 
@@ -79,9 +116,28 @@ function createAdminEvidenceRouter(evidenceService) {
     }
   })
 
+  // TODO(auth-required): restrict quick field observations to admins/trusted reviewers.
+  router.post('/farms/:farmId/field-observations', async (req, res, next) => {
+    try {
+      const input = validateFieldObservationBody(req.params.farmId, req.body)
+      const result = await evidenceService.createFieldObservation(input)
+      res.status(201).json(result)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   router.get('/evidence/expired', async (_req, res, next) => {
     try {
       res.json(await evidenceService.findExpiredEvidence())
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  router.get('/evidence/refresh-due', async (_req, res, next) => {
+    try {
+      res.json(await evidenceService.listRefreshDueEvidence())
     } catch (error) {
       next(error)
     }

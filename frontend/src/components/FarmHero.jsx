@@ -1,4 +1,12 @@
 import { FarmActions } from './FarmActions'
+import { formatDate } from './FarmDetailUtils'
+
+function formatTrustStatus(status) {
+  if (status === 'GOLD_STANDARD') return 'Gold Standard Farm'
+  if (status === 'VERIFIED') return 'Verified Farm'
+  if (status === 'PENDING_REVIEW') return 'Verification pending'
+  return 'Trust review in progress'
+}
 
 export function FarmHero({ farm }) {
   const profile = farm.verificationProfile
@@ -16,6 +24,12 @@ export function FarmHero({ farm }) {
           </span>
         </p>
         <p>{farm.description || 'Farm details are being gathered for this listing.'}</p>
+        {profile ? (
+          <div className="farm-trust-summary">
+            <strong>{formatTrustStatus(profile.status)}</strong>
+            <span>Official website reviewed {formatDate(profile.lastResearchedAt)}</span>
+          </div>
+        ) : null}
         <FarmActions farm={farm} />
       </div>
       <div

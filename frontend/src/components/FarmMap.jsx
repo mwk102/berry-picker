@@ -147,8 +147,14 @@ export function FarmMap({ farms = [], onSelectFarm, selectedFarm }) {
                   </span>
                 </div>
                 <div className="berry-chip-list popup-chip-list">
-                  {farm.berryTypes.map((berryType) => (
-                    <BerryChip key={berryType}>{berryType}</BerryChip>
+                  {farm.cropPriceRows.map((cropRow) => (
+                    <span
+                      className={`popup-crop-status ${cropRow.availability?.status || 'unknown'}`}
+                      key={cropRow.cropSlug || cropRow.cropName}
+                    >
+                      <BerryChip>{cropRow.cropName}</BerryChip>
+                      {cropRow.availability?.label ? <em>{cropRow.availability.label}</em> : null}
+                    </span>
                   ))}
                 </div>
                 <div className="popup-price-list" aria-label={`${farm.name} crop prices`}>
@@ -157,7 +163,12 @@ export function FarmMap({ farms = [], onSelectFarm, selectedFarm }) {
                       className={priceRow.hasPrice ? 'popup-price-row' : 'popup-price-row unavailable'}
                       key={priceRow.cropSlug || priceRow.cropName}
                     >
-                      <span>{priceRow.cropName}</span>
+                      <span>
+                        {priceRow.cropName}
+                        {priceRow.availability?.status === 'unavailable' ? (
+                          <em>{priceRow.availability.label}</em>
+                        ) : null}
+                      </span>
                       <strong>{priceRow.label}</strong>
                     </span>
                   ))}

@@ -16,7 +16,7 @@ export function Sidebar({
   return (
     <aside className="map-sidebar">
       <div className="sidebar-header">
-        <span className="sidebar-kicker">Berry Picker</span>
+        <span className="sidebar-kicker">Northwest U-Pick</span>
         <h1>Farm Finder</h1>
         <p>Search seasonal farms, compare prices, and stay close to Redmond.</p>
       </div>

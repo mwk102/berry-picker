@@ -158,7 +158,7 @@
   border-radius: var(--radius-lg);
 }
 
-.farm-card-button {
+.farm-card-link {
   display: grid;
   width: 100%;
   min-height: 44px;
@@ -171,39 +171,6 @@
   cursor: pointer;
   padding: var(--space-5);
   text-align: left;
-  transition:
-    border-color 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease;
-}
-
-.farm-card-button:hover,
-.farm-card-button:focus-visible,
-.farm-card.selected .farm-card-button {
-  border-color: rgba(47, 111, 70, 0.6);
-  box-shadow: var(--shadow-card-hover);
-  outline: none;
-  transform: translateY(-1px);
-}
-
-.farm-card.selected .farm-card-button {
-  background:
-    linear-gradient(90deg, rgba(183, 217, 104, 0.16), transparent 42%),
-    linear-gradient(180deg, white, var(--color-mint-50));
-  border-color: var(--color-leaf-600);
-}
-
-.farm-card-details-link {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: white;
-  color: var(--color-leaf-700);
-  font-size: 0.86rem;
-  font-weight: 950;
   text-decoration: none;
   transition:
     border-color 160ms ease,
@@ -211,15 +178,23 @@
     transform 160ms ease;
 }
 
-.farm-card-details-link:hover,
-.farm-card-details-link:focus-visible {
+.farm-card-link:hover,
+.farm-card-link:focus-visible,
+.farm-card.selected .farm-card-link {
   border-color: rgba(47, 111, 70, 0.6);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card-hover);
   outline: none;
   transform: translateY(-1px);
 }
 
-.farm-card.unverified .farm-card-button {
+.farm-card.selected .farm-card-link {
+  background:
+    linear-gradient(90deg, rgba(183, 217, 104, 0.16), transparent 42%),
+    linear-gradient(180deg, white, var(--color-mint-50));
+  border-color: var(--color-leaf-600);
+}
+
+.farm-card.unverified .farm-card-link {
   border-style: dashed;
   border-color: rgba(96, 112, 101, 0.55);
   background:
@@ -228,9 +203,9 @@
   opacity: 0.9;
 }
 
-.farm-card.unverified.selected .farm-card-button,
-.farm-card.unverified .farm-card-button:hover,
-.farm-card.unverified .farm-card-button:focus-visible {
+.farm-card.unverified.selected .farm-card-link,
+.farm-card.unverified .farm-card-link:hover,
+.farm-card.unverified .farm-card-link:focus-visible {
   border-color: rgba(75, 85, 79, 0.9);
   opacity: 1;
 }
@@ -335,6 +310,39 @@
   gap: var(--space-2);
 }
 
+.finder-crop-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.finder-crop-status em {
+  border-radius: var(--radius-pill);
+  background: var(--color-mint-100);
+  color: var(--color-leaf-700);
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 950;
+  padding: 4px 7px;
+  text-transform: uppercase;
+}
+
+.finder-crop-status.limited em,
+.finder-crop-status.upcoming em {
+  background: #fff7e7;
+  color: #7b4a22;
+}
+
+.finder-crop-status.unavailable {
+  opacity: 0.68;
+}
+
+.finder-crop-status.unavailable em {
+  background: #eef2ef;
+  color: #526159;
+}
+
 .berry-chip {
   display: inline-flex;
   align-items: center;
@@ -399,9 +407,21 @@
 }
 
 .finder-price-chip span {
+  display: inline-flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.finder-price-chip span em {
+  color: var(--color-muted);
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .finder-price-chip strong {
@@ -417,6 +437,44 @@
 
 .finder-price-chip.unavailable strong {
   color: var(--color-muted);
+}
+
+.freshness-chip {
+  display: grid;
+  gap: 3px;
+  border: 1px solid rgba(47, 111, 70, 0.14);
+  border-radius: var(--radius-md);
+  background: var(--color-mint-50);
+  color: var(--color-muted);
+  padding: 9px 10px;
+}
+
+.freshness-chip strong {
+  color: var(--color-forest-800);
+  font-size: 0.76rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.freshness-chip span {
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
+.freshness-chip.field {
+  border-color: rgba(47, 111, 70, 0.28);
+  background: rgba(231, 246, 233, 0.78);
+}
+
+.freshness-chip.stale,
+.freshness-chip.low {
+  border-color: rgba(178, 111, 32, 0.22);
+  background: #fff7e7;
+}
+
+.freshness-chip.expired {
+  border-color: rgba(185, 54, 95, 0.24);
+  background: #f7e5e8;
 }
 
 .empty-state {
@@ -572,7 +630,7 @@
     grid-template-columns: 1fr;
   }
 
-  .farm-card-button {
+  .farm-card-link {
     padding: var(--space-4);
   }
 

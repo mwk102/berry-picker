@@ -4,6 +4,14 @@ function completenessSymbol(isComplete) {
   return isComplete ? 'Yes' : 'Missing'
 }
 
+function formatLabel(value) {
+  if (!value) return 'Not listed'
+  return String(value)
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase())
+}
+
 export function GoldStandardPanel({ profile }) {
   if (!profile) return null
 
@@ -17,7 +25,7 @@ export function GoldStandardPanel({ profile }) {
       <div className="gold-standard-meta">
         <span>
           <strong>Status</strong>
-          {profile.status}
+          {formatLabel(profile.status)}
         </span>
         <span>
           <strong>Last website review</strong>

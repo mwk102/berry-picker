@@ -1,4 +1,5 @@
 import { StatusBadge } from './StatusBadge'
+import { farmFreshnessSummary, isCurrentlyPickable } from './FarmDetailUtils'
 
 function freshnessText(confidence) {
   if (confidence.freshness === null) return 'No recent reports yet'
@@ -13,7 +14,31 @@ function worthLabel(score) {
   return 'Needs more data'
 }
 
+function pickableText(cropStatuses) {
+  const pickable = cropStatuses.filter((crop) => isCurrentlyPickable(crop))
+  const upcoming = cropStatuses.filter((crop) => crop.stage === 'COMING_SOON')
+  const ended = cropStatuses.filter((crop) => crop.latestReport?.condition === 'SEASON_OVER')
+
+  if (pickable.length > 0) {
+    const names = pickable.map((crop) => crop.name).join(', ')
+    const suffix = upcoming.length > 0 ? `; ${upcoming.map((crop) => crop.name).join(', ')} coming soon` : ''
+    return `${names}${suffix}`
+  }
+
+  if (upcoming.length > 0) {
+    return `${upcoming.map((crop) => crop.name).join(', ')} coming soon`
+  }
+
+  if (ended.length > 0) {
+    return `${ended.map((crop) => crop.name).join(', ')} over for the season`
+  }
+
+  return 'No current crop data yet'
+}
+
 export function FarmStatusPanel({ confidence, cropStatuses, farm, worthTheDrive }) {
+  const freshness = farmFreshnessSummary(farm)
+
   return (
     <section className="farm-panel status-panel">
       <div className="panel-heading">
@@ -24,17 +49,17 @@ export function FarmStatusPanel({ confidence, cropStatuses, farm, worthTheDrive 
       <div className="status-answer-grid">
         <span>
           <strong>Is it open?</strong>
-          {farm.status === 'ACTIVE' ? 'Likely open, confirm before visiting' : 'Unknown'}
+          {farm.status === 'ACTIVE'
+            ? 'Listed open, but crop availability can change quickly'
+            : 'Unknown'}
         </span>
         <span>
           <strong>What can I pick?</strong>
-          {cropStatuses.length > 0
-            ? cropStatuses.map((crop) => crop.name).join(', ')
-            : 'No crop data yet'}
+          {pickableText(cropStatuses)}
         </span>
         <span>
           <strong>How fresh is this?</strong>
-          {freshnessText(confidence)}
+          {freshness.label} - {freshness.detail || freshnessText(confidence)}
         </span>
         <span>
           <strong>Worth the drive?</strong>

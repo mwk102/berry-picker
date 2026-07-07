@@ -1,0 +1,229 @@
+{
+  "generatedAt": "2026-07-07T07:43:57.281Z",
+  "summary": {
+    "dueEvidenceCount": 11,
+    "dueFarmCount": 5,
+    "byFarm": [
+      {
+        "farmSlug": "henna-blueberry-farm",
+        "farmName": "Henna Blueberry Farm",
+        "dueCount": 1,
+        "statuses": {
+          "expired": 1
+        }
+      },
+      {
+        "farmSlug": "remlinger-farms",
+        "farmName": "Remlinger Farms",
+        "dueCount": 3,
+        "statuses": {
+          "expired": 2,
+          "low_confidence": 1
+        }
+      },
+      {
+        "farmSlug": "bailey-farm",
+        "farmName": "Bailey Farm",
+        "dueCount": 2,
+        "statuses": {
+          "expired": 2
+        }
+      },
+      {
+        "farmSlug": "harvold-berry-farm",
+        "farmName": "Harvold Berry Farm and Veggies",
+        "dueCount": 3,
+        "statuses": {
+          "expired": 2,
+          "low_confidence": 1
+        }
+      },
+      {
+        "farmSlug": "bells-farm",
+        "farmName": "Bell's Farm",
+        "dueCount": 2,
+        "statuses": {
+          "low_confidence": 2
+        }
+      }
+    ]
+  },
+  "items": [
+    {
+      "farmSlug": "henna-blueberry-farm",
+      "farmName": "Henna Blueberry Farm",
+      "cropSlug": "blueberry",
+      "cropName": "Blueberry",
+      "evidenceType": "HARVEST_STATUS",
+      "fieldName": "harvestStatus",
+      "sourceType": "OFFICIAL_WEBSITE",
+      "sourceName": "Henna Blueberry Farm official website",
+      "sourceUrl": "https://hennablueberryfarm.com/u-pick-hours-new/",
+      "observedAt": "2026-07-02T00:00:00.000Z",
+      "expiresAt": "2026-07-05T00:00:00.000Z",
+      "confidenceScore": 84,
+      "status": "expired",
+      "value": "Official U Pick Hours page lists blueberry U-pick hours and says fields may close early when picked out; call ahead to confirm field availability."
+    },
+    {
+      "farmSlug": "remlinger-farms",
+      "farmName": "Remlinger Farms",
+      "cropSlug": "strawberry",
+      "cropName": "Strawberry",
+      "evidenceType": "HARVEST_STATUS",
+      "fieldName": "harvestStatus",
+      "sourceType": "OFFICIAL_WEBSITE",
+      "sourceName": "Remlinger Farms official website",
+      "sourceUrl": "https://remlingerfarms.com/",
+      "observedAt": "2026-07-02T00:00:00.000Z",
+      "expiresAt": "2026-07-05T00:00:00.000Z",
+      "confidenceScore": 88,
+      "status": "expired",
+      "value": "Official homepage update indicated strawberry U-pick was closed for the season."
+    },
+    {
+      "farmSlug": "remlinger-farms",
+      "farmName": "Remlinger Farms",
+      "cropSlug": "raspberry",
+      "cropName": "Raspberry",
+      "evidenceType": "HARVEST_STATUS",
+      "fieldName": "harvestStatus",
+      "sourceType": "OFFICIAL_WEBSITE",
+      "sourceName": "Remlinger Farms official website",
+      "sourceUrl": "https://remlingerfarms.com/",
+      "observedAt": "2026-07-02T00:00:00.000Z",
+      "expiresAt": "2026-07-05T00:00:00.000Z",
+      "confidenceScore": 88,
+      "status": "expired",
+      "value": "Official homepage update listed Raspberry U-Pick open July 2, 3, and 4 at the main farm campus."
+    },
+    {
+      "farmSlug": "bailey-farm",
+      "farmName": "Bailey Farm",
+      "cropSlug": "raspberry",
+      "cropName": "Raspberry",
+      "evidenceType": "HARVEST_STATUS",
+      "fieldName": "harvestStatus",
+      "sourceType": "OFFICIAL_WEBSITE",
+      "sourceName": "Bailey Farm official website",
+      "sourceUrl": "https://www.baileyveg.com/",
+      "observedAt": "2026-07-02T00:00:00.000Z",
+      "expiresAt": "2026-07-05T00:00:00.000Z",
+      "confidenceScore": 92,
+      "status": "expired",
+      "value": "Official homepage update listed U-pick raspberries open at $6/lb."
+    },
+    {
+      "farmSlug": "bailey-farm",
+      "farmName": "Bailey Farm",
+      "cropSlug": "strawberry",
+      "cropName": "Strawberry",
+      "evidenceType": "HARVEST_STATUS",
+      "fieldName": "harvestStatus",
+      "sourceType": "OFFICIAL_WEBSITE",
+      "sourceName": "Bailey Farm official website",
+      "sourceUrl": "https://www.baileyveg.com/",
+      "observedAt": "2026-07-02T00:00:00.000Z",
+      "expiresAt": "2026-07-05T00:00:00.000Z",
+      "confidenceScore": 92,
+      "status": "expired",
+      "value": "Official homepage update listed U-pick strawberries open at $4/lb."
+    },
+    {
+      "farmSlug": "harvold-berry-farm",
+      "farmName": "Harvold Berry Farm and Veggies",
+      "cropSlug": "strawberry",
+      "cropName": "Strawberry",
+      "evidenceType": "HARVEST_STATUS",
+      "fieldName": "harvestStatus",
+      "sourceType": "OFFICIAL_WEBSITE",
+      "sourceName": "Harvold Berry Farm official website",
+      "sourceUrl": "https://harvoldberryfarm.com/",
+      "observedAt": "2026-07-02T00:00:00.000Z",
+      "expiresAt": "2026-07-05T00:00:00.000Z",
+      "confidenceScore": 95,
+      "status": "expired",
+      "value": "Official homepage update: strawberry field at 7701 Carnation Duvall Rd NE; open during posted berry hours unless picked out."
+    },
+    {
+      "farmSlug": "harvold-berry-farm",
+      "farmName": "Harvold Berry Farm and Veggies",
+      "cropSlug": "raspberry",
+      "cropName": "Raspberry",
+      "evidenceType": "HARVEST_STATUS",
+      "fieldName": "harvestStatus",
+      "sourceType": "OFFICIAL_WEBSITE",
+      "sourceName": "Harvold Berry Farm official website",
+      "sourceUrl": "https://harvoldberryfarm.com/",
+      "observedAt": "2026-07-02T00:00:00.000Z",
+      "expiresAt": "2026-07-05T00:00:00.000Z",
+      "confidenceScore": 95,
+      "status": "expired",
+      "value": "Official homepage update noted raspberry picking at 5207 Carnation Duvall Rd NE and a next-picking update around July 1."
+    },
+    {
+      "farmSlug": "harvold-berry-farm",
+      "farmName": "Harvold Berry Farm and Veggies",
+      "cropSlug": null,
+      "cropName": null,
+      "evidenceType": "AMENITY",
+      "fieldName": "amenity",
+      "sourceType": "OFFICIAL_WEBSITE",
+      "sourceName": "Harvold Berry Farm official website",
+      "sourceUrl": "https://harvoldberryfarm.com/",
+      "observedAt": "2026-07-02T00:00:00.000Z",
+      "expiresAt": "2026-09-30T00:00:00.000Z",
+      "confidenceScore": 62,
+      "status": "low_confidence",
+      "value": "parking, kid-friendly, farm-store"
+    },
+    {
+      "farmSlug": "bells-farm",
+      "farmName": "Bell's Farm",
+      "cropSlug": null,
+      "cropName": null,
+      "evidenceType": "AMENITY",
+      "fieldName": "amenity",
+      "sourceType": "OFFICIAL_WEBSITE",
+      "sourceName": "Bell's Farm official website",
+      "sourceUrl": "https://www.bells-farm.com/",
+      "observedAt": "2026-07-02T00:00:00.000Z",
+      "expiresAt": "2026-09-30T00:00:00.000Z",
+      "confidenceScore": 62,
+      "status": "low_confidence",
+      "value": "farm-store"
+    },
+    {
+      "farmSlug": "remlinger-farms",
+      "farmName": "Remlinger Farms",
+      "cropSlug": null,
+      "cropName": null,
+      "evidenceType": "AMENITY",
+      "fieldName": "amenity",
+      "sourceType": "OFFICIAL_WEBSITE",
+      "sourceName": "Remlinger Farms official website",
+      "sourceUrl": "https://remlingerfarms.com/",
+      "observedAt": "2026-07-02T00:00:00.000Z",
+      "expiresAt": "2026-09-30T00:00:00.000Z",
+      "confidenceScore": 62,
+      "status": "low_confidence",
+      "value": "kid-friendly, farm-store, food-available"
+    },
+    {
+      "farmSlug": "bells-farm",
+      "farmName": "Bell's Farm",
+      "cropSlug": null,
+      "cropName": null,
+      "evidenceType": "LOCATION",
+      "fieldName": "coordinates",
+      "sourceType": "OFFICIAL_WEBSITE",
+      "sourceName": "Bell's Farm official website",
+      "sourceUrl": "manual address research from 892 West Beach Rd, Coupeville, WA 98239",
+      "observedAt": "2026-07-02T00:00:00.000Z",
+      "expiresAt": "2026-12-29T00:00:00.000Z",
+      "confidenceScore": 62,
+      "status": "low_confidence",
+      "value": "48.2309, -122.7616"
+    }
+  ]
+}

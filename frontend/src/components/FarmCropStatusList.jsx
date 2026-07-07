@@ -2,10 +2,18 @@ import { BerryChip } from './BerryChip'
 import { SeasonStageBadge } from './SeasonStageBadge'
 import { formatDate, formatPrice, getLatestPrice, getLatestReport, reportFreshnessDays } from './FarmDetailUtils'
 
+function formatReportCondition(value) {
+  return value
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase())
+}
+
 function reportText(report) {
   if (!report) return 'No recent report'
+  if (!report.condition || report.condition === 'UNKNOWN') return 'No confirmed condition'
   const freshness = reportFreshnessDays(report)
-  return `${report.condition}${freshness === null ? '' : ` - ${freshness}d old`}`
+  return `${formatReportCondition(report.condition)}${freshness === null ? '' : ` - ${freshness}d old`}`
 }
 
 export function FarmCropStatusList({ cropStatuses }) {

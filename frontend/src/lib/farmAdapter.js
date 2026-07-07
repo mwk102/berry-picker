@@ -10,6 +10,7 @@ const sourceLabels = {
   OPENSTREETMAP: 'OpenStreetMap',
   MANUAL_RESEARCH: 'Manual Research',
   FARM_WEBSITE: 'Official Website',
+  FIELD_OBSERVATION: 'Field Observation',
   ADMIN: 'Admin Review',
 }
 
@@ -36,6 +37,65 @@ function formatPrice(price) {
 
   const unit = price.unitLabel ? `/${price.unitLabel}` : ''
   return `$${price.amount.toFixed(2)}${unit}`
+}
+
+function formatCondition(condition) {
+  if (!condition || condition === 'UNKNOWN') return null
+  return condition
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase())
+}
+
+function getLatestReport(reports = []) {
+  return [...reports].sort(
+    (first, second) => new Date(second.createdAt) - new Date(first.createdAt),
+  )[0]
+}
+
+function seasonStageForFarmCrop(farmCrop, asOfDate = new Date()) {
+  const start = farmCrop.seasonStartDate ? new Date(farmCrop.seasonStartDate) : null
+  const end = farmCrop.seasonEndDate ? new Date(farmCrop.seasonEndDate) : null
+  const peakStart = farmCrop.peakStartDate ? new Date(farmCrop.peakStartDate) : null
+  const peakEnd = farmCrop.peakEndDate ? new Date(farmCrop.peakEndDate) : null
+
+  if (!start || !end) return 'UNKNOWN'
+  if (asOfDate < start) return 'COMING_SOON'
+  if (asOfDate > end) return 'ENDED'
+  if (peakStart && peakEnd && asOfDate >= peakStart && asOfDate <= peakEnd) return 'PEAK'
+  return 'IN_SEASON'
+}
+
+function getCropAvailability(farmCrop) {
+  const latestReport = getLatestReport(farmCrop.reports)
+  const condition = latestReport?.condition
+
+  if (condition === 'SEASON_OVER') {
+    return { status: 'unavailable', label: 'Season over' }
+  }
+  if (condition === 'PICKED_OVER') {
+    return { status: 'unavailable', label: 'Picked over' }
+  }
+  if (condition === 'CLOSED') {
+    return { status: 'unavailable', label: 'Closed' }
+  }
+  if (condition === 'COMING_SOON') {
+    return { status: 'upcoming', label: 'Coming soon' }
+  }
+  if (condition === 'LIMITED') {
+    return { status: 'limited', label: 'Limited' }
+  }
+  if (condition === 'GOOD' || condition === 'EXCELLENT') {
+    return { status: 'available', label: formatCondition(condition) }
+  }
+
+  const seasonStage = seasonStageForFarmCrop(farmCrop)
+  if (seasonStage === 'COMING_SOON') return { status: 'upcoming', label: 'Coming soon' }
+  if (seasonStage === 'ENDED') return { status: 'unavailable', label: 'Season ended' }
+  if (seasonStage === 'PEAK') return { status: 'available', label: 'Peak window' }
+  if (seasonStage === 'IN_SEASON') return { status: 'available', label: 'In season' }
+
+  return { status: 'unknown', label: null }
 }
 
 function getCurrentDayOfWeek() {
@@ -79,6 +139,7 @@ function getCropPriceRows(farm) {
     return {
       cropSlug: farmCrop.crop?.slug,
       cropName: farmCrop.crop?.name || 'Crop',
+      availability: getCropAvailability(farmCrop),
       hasPrice: Boolean(lowestPrice),
       label: formatPrice(lowestPrice),
       price: lowestPrice,
@@ -127,6 +188,88 @@ function getPriceSummary(cropPriceRows) {
   return `${pricedRows.length} prices listed`
 }
 
+function formatShortDate(value) {
+  if (!value) return 'date unknown'
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+  }).format(new Date(value))
+}
+
+function getFreshnessSummary(farm) {
+  const evidence = [...(farm.evidence || [])]
+  const reports = [...(farm.pickingReports || [])]
+  const evidenceTypePriority = {
+    HARVEST_STATUS: 0,
+    CROP_AVAILABILITY: 1,
+  }
+  const latestHarvestEvidence = evidence
+    .filter((record) =>
+      ['FIELD_OBSERVATION', 'OFFICIAL_WEBSITE', 'FARM_OWNER', 'ADMIN_RESEARCH'].includes(record.sourceType) &&
+      ['HARVEST_STATUS', 'CROP_AVAILABILITY'].includes(record.evidenceType),
+    )
+    .sort(
+      (first, second) =>
+        new Date(second.observedAt) - new Date(first.observedAt) ||
+        (evidenceTypePriority[first.evidenceType] ?? 9) - (evidenceTypePriority[second.evidenceType] ?? 9),
+    )[0]
+  const expired = evidence.find((record) => record.status === 'expired')
+  const stale = evidence.find((record) => record.status === 'stale')
+  const lowConfidence = evidence.find((record) => record.status === 'low confidence')
+  const latestReport = reports.sort((first, second) => new Date(second.createdAt) - new Date(first.createdAt))[0]
+
+  if (latestHarvestEvidence) {
+    const condition = latestHarvestEvidence.normalizedValue?.condition
+      ?.replace(/_/g, ' ')
+      .toLowerCase()
+    const labelPrefix =
+      latestHarvestEvidence.sourceType === 'FIELD_OBSERVATION' ? 'Field check' : 'Official update'
+    return {
+      status: latestHarvestEvidence.status === 'expired' ? 'expired' : latestHarvestEvidence.sourceType === 'FIELD_OBSERVATION' ? 'field' : 'fresh',
+      label: `${labelPrefix} ${formatShortDate(latestHarvestEvidence.observedAt)}`,
+      detail: condition ? condition.replace(/^./, (letter) => letter.toUpperCase()) : latestHarvestEvidence.value,
+    }
+  }
+
+  if (expired) {
+    return {
+      status: 'expired',
+      label: 'Needs refresh',
+      detail: `${expired.fieldName} expired ${formatShortDate(expired.expiresAt)}`,
+    }
+  }
+
+  if (stale) {
+    return {
+      status: 'stale',
+      label: 'Refresh soon',
+      detail: `${stale.fieldName} expires ${formatShortDate(stale.expiresAt)}`,
+    }
+  }
+
+  if (lowConfidence) {
+    return {
+      status: 'low',
+      label: 'Low confidence',
+      detail: `${lowConfidence.fieldName} needs review`,
+    }
+  }
+
+  if (latestReport) {
+    return {
+      status: 'fresh',
+      label: `Latest report ${formatShortDate(latestReport.createdAt)}`,
+      detail: latestReport.condition?.replace(/_/g, ' ').toLowerCase() || 'Report available',
+    }
+  }
+
+  return {
+    status: 'unknown',
+    label: 'Freshness unknown',
+    detail: 'Needs a current check',
+  }
+}
+
 export function normalizeFarm(apiFarm) {
   const berryTypes = apiFarm.crops?.map((farmCrop) => farmCrop.crop?.name).filter(Boolean) || []
   const cropSlugs = apiFarm.crops?.map((farmCrop) => farmCrop.crop?.slug).filter(Boolean) || []
@@ -158,6 +301,7 @@ export function normalizeFarm(apiFarm) {
     sourceLabel: formatDataSource(apiFarm.dataSource),
     cropPriceRows,
     priceSummaryLabel: getPriceSummary(cropPriceRows),
+    freshnessSummary: getFreshnessSummary(apiFarm),
     ...price,
   }
 }

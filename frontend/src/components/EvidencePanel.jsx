@@ -4,6 +4,10 @@ function statusClassName(status) {
   return `evidence-status ${String(status || 'fresh').replace(/\s+/g, '-')}`
 }
 
+function isExternalUrl(value) {
+  return /^https?:\/\//i.test(value || '')
+}
+
 export function EvidencePanel({ evidence = [] }) {
   return (
     <details className="farm-panel evidence-panel">
@@ -36,9 +40,13 @@ export function EvidencePanel({ evidence = [] }) {
               <div className="evidence-meta-grid">
                 <span>
                   <strong>Source</strong>
-                  <a href={record.sourceUrl} rel="noreferrer" target="_blank">
-                    {record.sourceName}
-                  </a>
+                  {isExternalUrl(record.sourceUrl) ? (
+                    <a href={record.sourceUrl} rel="noreferrer" target="_blank">
+                      {record.sourceName}
+                    </a>
+                  ) : (
+                    record.sourceName
+                  )}
                 </span>
                 <span>
                   <strong>Confidence</strong>

@@ -107,6 +107,38 @@
   gap: 6px;
 }
 
+.popup-crop-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.popup-crop-status em {
+  border-radius: 999px;
+  background: var(--color-mint-100);
+  color: var(--color-leaf-700);
+  font-size: 0.66rem;
+  font-style: normal;
+  font-weight: 950;
+  padding: 3px 6px;
+  text-transform: uppercase;
+}
+
+.popup-crop-status.limited em,
+.popup-crop-status.upcoming em {
+  background: #fff7e7;
+  color: #7b4a22;
+}
+
+.popup-crop-status.unavailable {
+  opacity: 0.7;
+}
+
+.popup-crop-status.unavailable em {
+  background: #eef2ef;
+  color: #526159;
+}
+
 .popup-chip-list .berry-chip {
   min-height: 24px;
   font-size: 0.74rem;
@@ -133,6 +165,19 @@
 .popup-price-row span,
 .popup-price-row strong {
   font-size: 0.82rem;
+}
+
+.popup-price-row > span {
+  display: grid;
+  gap: 2px;
+}
+
+.popup-price-row span em {
+  color: var(--color-muted);
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .popup-price-row strong {

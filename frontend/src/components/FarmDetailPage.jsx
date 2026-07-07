@@ -1,9 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { EmptyState } from './EmptyState'
-import { EvidencePanel } from './EvidencePanel'
 import { FarmAmenitiesGrid } from './FarmAmenitiesGrid'
 import { FarmAnnouncements } from './FarmAnnouncements'
-import { FarmConfidencePanel } from './FarmConfidencePanel'
 import { FarmCropStatusList } from './FarmCropStatusList'
 import { FarmHero } from './FarmHero'
 import { FarmHoursPanel } from './FarmHoursPanel'
@@ -11,7 +9,6 @@ import { FarmPersonalityPanel } from './FarmPersonalityPanel'
 import { FarmPricePanel } from './FarmPricePanel'
 import { FarmReportsList } from './FarmReportsList'
 import { FarmStatusPanel } from './FarmStatusPanel'
-import { GoldStandardPanel } from './GoldStandardPanel'
 import { HarvestTimeline } from './HarvestTimeline'
 import { NearbyFarms } from './NearbyFarms'
 import { WhyVisitToday } from './WhyVisitToday'
@@ -40,6 +37,19 @@ function FarmDetailSkeleton() {
   )
 }
 
+function stageFromLatestReport(report, fallbackStage) {
+  if (!report) return fallbackStage
+
+  if (['SEASON_OVER', 'PICKED_OVER', 'CLOSED'].includes(report.condition)) {
+    return 'ENDED'
+  }
+  if (report.condition === 'COMING_SOON') {
+    return 'COMING_SOON'
+  }
+
+  return fallbackStage
+}
+
 function buildCropStatuses(farm) {
   return (farm.crops || []).map((farmCrop) => {
     const latestReport = getLatestReport(farmCrop.reports)
@@ -57,7 +67,8 @@ function buildCropStatuses(farm) {
     return {
       ...farmCrop,
       name: farmCrop.crop?.name || 'Crop',
-      stage: seasonStageForCrop(farmCrop),
+      latestReport,
+      stage: stageFromLatestReport(latestReport, seasonStageForCrop(farmCrop)),
       confidenceScore,
     }
   })
@@ -122,6 +133,7 @@ export function FarmDetailPage() {
       {/* TODO(owner-verified-updates): allow farm owners to update hours, prices, crops, and announcements. */}
       {/* TODO(community-report-submission): add visitor report submission after auth/community trust is ready. */}
       <FarmHero farm={farm} />
+      <FarmAnnouncements announcements={farm.announcements || []} />
 
       <FarmStatusPanel
         confidence={confidence}
@@ -131,19 +143,20 @@ export function FarmDetailPage() {
       />
 
       <div className="farm-detail-grid">
-        <WhyVisitToday reason={whyVisit} />
-        <FarmCropStatusList cropStatuses={cropStatuses} />
-        <HarvestTimeline cropStatuses={cropStatuses} />
-        <FarmPersonalityPanel personality={farm.verificationProfile?.personality} />
-        <FarmConfidencePanel confidence={confidence} />
-        <GoldStandardPanel profile={farm.verificationProfile} />
-        <FarmPricePanel prices={priceRows} />
-        <FarmHoursPanel hours={farm.hours || []} specialHours={farm.specialHours || []} />
-        <FarmAmenitiesGrid amenities={farm.amenities || []} />
-        <FarmReportsList reports={farm.pickingReports || []} />
-        <FarmAnnouncements announcements={farm.announcements || []} />
-        <NearbyFarms farms={farm.nearbyFarms || []} />
-        <EvidencePanel evidence={farm.evidence || []} />
+        <div className="farm-detail-column">
+          <WhyVisitToday reason={whyVisit} />
+          <FarmCropStatusList cropStatuses={cropStatuses} />
+          <HarvestTimeline cropStatuses={cropStatuses} />
+          <FarmPersonalityPanel personality={farm.verificationProfile?.personality} />
+          <FarmPricePanel prices={priceRows} />
+          <FarmAmenitiesGrid amenities={farm.amenities || []} />
+          <NearbyFarms farms={farm.nearbyFarms || []} />
+        </div>
+
+        <div className="farm-detail-column">
+          <FarmHoursPanel hours={farm.hours || []} specialHours={farm.specialHours || []} />
+          <FarmReportsList reports={farm.pickingReports || []} />
+        </div>
       </div>
     </div>
   )

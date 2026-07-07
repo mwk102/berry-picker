@@ -1,5 +1,8 @@
 export function FarmPersonalityPanel({ personality }) {
-  if (!personality?.bestFor?.length && !personality?.knownFor?.length) {
+  const bestFor = (personality?.bestFor || []).filter((item) => item !== 'Young Children')
+  const knownFor = personality?.knownFor || []
+
+  if (!bestFor.length && !knownFor.length) {
     return null
   }
 
@@ -10,21 +13,21 @@ export function FarmPersonalityPanel({ personality }) {
       </div>
 
       <div className="personality-groups">
-        {personality.bestFor?.length ? (
+        {bestFor.length ? (
           <div>
             <strong>Best for</strong>
             <div className="personality-chip-list">
-              {personality.bestFor.map((item) => (
+              {bestFor.map((item) => (
                 <span key={item}>{item}</span>
               ))}
             </div>
           </div>
         ) : null}
-        {personality.knownFor?.length ? (
+        {knownFor.length ? (
           <div>
             <strong>Known for</strong>
             <div className="personality-chip-list">
-              {personality.knownFor.map((item) => (
+              {knownFor.map((item) => (
                 <span key={item}>{item}</span>
               ))}
             </div>

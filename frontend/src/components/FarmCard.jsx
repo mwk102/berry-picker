@@ -14,11 +14,12 @@ export function FarmCard({ farm, isSelected, onSelect }) {
 
   return (
     <article className={cardClassName}>
-      <button
-        aria-pressed={isSelected}
-        className="farm-card-button"
-        onClick={() => onSelect(farm)}
-        type="button"
+      <Link
+        aria-current={isSelected ? 'true' : undefined}
+        className="farm-card-link"
+        onFocus={() => onSelect(farm)}
+        onMouseEnter={() => onSelect(farm)}
+        to={`/farms/${farm.slug}`}
       >
         <span className="farm-card-topline">
           <span className="farm-city">{farm.city}</span>
@@ -42,9 +43,20 @@ export function FarmCard({ farm, isSelected, onSelect }) {
         <span className="farm-card-name">{farm.name}</span>
         <span className="farm-card-description">{farm.description}</span>
 
+        <span className={`freshness-chip ${farm.freshnessSummary?.status || 'unknown'}`}>
+          <strong>{farm.freshnessSummary?.label || 'Freshness unknown'}</strong>
+          <span>{farm.freshnessSummary?.detail || 'Needs a current check'}</span>
+        </span>
+
         <span className="berry-chip-list" aria-label={`${farm.name} crop types`}>
-          {farm.berryTypes.map((berryType) => (
-            <BerryChip key={berryType}>{berryType}</BerryChip>
+          {farm.cropPriceRows.map((cropRow) => (
+            <span
+              className={`finder-crop-status ${cropRow.availability?.status || 'unknown'}`}
+              key={cropRow.cropSlug || cropRow.cropName}
+            >
+              <BerryChip>{cropRow.cropName}</BerryChip>
+              {cropRow.availability?.label ? <em>{cropRow.availability.label}</em> : null}
+            </span>
           ))}
         </span>
 
@@ -64,14 +76,16 @@ export function FarmCard({ farm, isSelected, onSelect }) {
               className={priceRow.hasPrice ? 'finder-price-chip' : 'finder-price-chip unavailable'}
               key={priceRow.cropSlug || priceRow.cropName}
             >
-              <span>{priceRow.cropName}</span>
+              <span>
+                {priceRow.cropName}
+                {priceRow.availability?.status === 'unavailable' ? (
+                  <em>{priceRow.availability.label}</em>
+                ) : null}
+              </span>
               <strong>{priceRow.label}</strong>
             </span>
           ))}
         </span>
-      </button>
-      <Link className="farm-card-details-link" to={`/farms/${farm.slug}`}>
-        View details
       </Link>
     </article>
   )

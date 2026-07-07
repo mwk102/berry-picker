@@ -13,23 +13,31 @@ const expectedAmenities = [
 
 export function FarmAmenitiesGrid({ amenities }) {
   const availableAmenities = new Set(amenities.map((amenity) => amenity.slug))
+  const confirmedAmenities = expectedAmenities.filter((amenity) => availableAmenities.has(amenity.slug))
+  const unconfirmedAmenities = expectedAmenities.filter((amenity) => !availableAmenities.has(amenity.slug))
 
   return (
     <section className="farm-panel">
       <div className="panel-heading">
         <h2>Amenities</h2>
       </div>
-      <div className="amenities-grid">
-        {expectedAmenities.map((amenity) => {
-          const isAvailable = availableAmenities.has(amenity.slug)
-          return (
-            <span className={isAvailable ? 'amenity available' : 'amenity'} key={amenity.slug}>
-              <strong>{isAvailable ? 'Yes' : 'Unknown'}</strong>
+      {confirmedAmenities.length > 0 ? (
+        <div className="amenities-grid">
+          {confirmedAmenities.map((amenity) => (
+            <span className="amenity available" key={amenity.slug}>
+              <strong>Confirmed</strong>
               {amenity.label}
             </span>
-          )
-        })}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <p className="panel-muted">No amenities have been confirmed yet.</p>
+      )}
+      {unconfirmedAmenities.length > 0 ? (
+        <p className="amenities-unconfirmed">
+          Needs confirmation: {unconfirmedAmenities.map((amenity) => amenity.label).join(', ')}
+        </p>
+      ) : null}
     </section>
   )
 }

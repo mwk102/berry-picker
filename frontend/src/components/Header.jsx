@@ -13,9 +13,9 @@ export function Header() {
       <nav className="site-nav" aria-label="Primary navigation">
         <NavLink className="brand" to="/">
           <span className="brand-mark" aria-hidden="true">
-            BP
+            NU
           </span>
-          <span>Berry Picker</span>
+          <span>Northwest U-Pick</span>
         </NavLink>
 
         <div className="nav-links">

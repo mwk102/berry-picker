@@ -8,7 +8,7 @@ export function FarmAnnouncements({ announcements }) {
   return (
     <section className="farm-panel announcements-panel">
       <div className="panel-heading">
-        <h2>Announcements</h2>
+        <h2>Before you go</h2>
       </div>
       <div className="announcement-list">
         {announcements.map((announcement) => (

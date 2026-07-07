@@ -47,6 +47,70 @@ export function reportFreshnessDays(report) {
   return Math.max(0, Math.floor(elapsed / 86400000))
 }
 
+export function farmFreshnessSummary(farm) {
+  const evidence = [...(farm.evidence || [])]
+  const evidenceTypePriority = {
+    HARVEST_STATUS: 0,
+    CROP_AVAILABILITY: 1,
+  }
+  const latestHarvestEvidence = evidence
+    .filter((record) =>
+      ['FIELD_OBSERVATION', 'OFFICIAL_WEBSITE', 'FARM_OWNER', 'ADMIN_RESEARCH'].includes(record.sourceType) &&
+      ['HARVEST_STATUS', 'CROP_AVAILABILITY'].includes(record.evidenceType),
+    )
+    .sort(
+      (first, second) =>
+        new Date(second.observedAt) - new Date(first.observedAt) ||
+        (evidenceTypePriority[first.evidenceType] ?? 9) - (evidenceTypePriority[second.evidenceType] ?? 9),
+    )[0]
+  const expired = evidence.find((record) => record.status === 'expired')
+  const stale = evidence.find((record) => record.status === 'stale')
+  const lowConfidence = evidence.find((record) => record.status === 'low confidence')
+
+  if (latestHarvestEvidence) {
+    const condition = latestHarvestEvidence.normalizedValue?.condition
+      ?.replace(/_/g, ' ')
+      .toLowerCase()
+    const labelPrefix =
+      latestHarvestEvidence.sourceType === 'FIELD_OBSERVATION' ? 'Field checked' : 'Official update'
+    return {
+      status: latestHarvestEvidence.status === 'expired' ? 'expired' : latestHarvestEvidence.sourceType === 'FIELD_OBSERVATION' ? 'field' : 'fresh',
+      label: `${labelPrefix} ${formatDate(latestHarvestEvidence.observedAt)}`,
+      detail: condition ? condition.replace(/^./, (letter) => letter.toUpperCase()) : latestHarvestEvidence.value,
+    }
+  }
+
+  if (expired) {
+    return {
+      status: 'expired',
+      label: 'Needs refresh',
+      detail: `${expired.fieldName} expired ${formatDate(expired.expiresAt)}`,
+    }
+  }
+
+  if (stale) {
+    return {
+      status: 'stale',
+      label: 'Refresh soon',
+      detail: `${stale.fieldName} expires ${formatDate(stale.expiresAt)}`,
+    }
+  }
+
+  if (lowConfidence) {
+    return {
+      status: 'low',
+      label: 'Low confidence',
+      detail: `${lowConfidence.fieldName} needs review`,
+    }
+  }
+
+  return {
+    status: 'unknown',
+    label: 'Evidence freshness unknown',
+    detail: 'Needs a current source or field check',
+  }
+}
+
 export function seasonStageForCrop(farmCrop, asOfDate = new Date()) {
   const start = farmCrop.seasonStartDate ? new Date(farmCrop.seasonStartDate) : null
   const end = farmCrop.seasonEndDate ? new Date(farmCrop.seasonEndDate) : null
@@ -99,21 +163,38 @@ export function confidenceForFarm(farm) {
 export function worthTheDriveForFarm(farm, cropStatuses) {
   const confidence = confidenceForFarm(farm)
   const openBoost = farm.status === 'ACTIVE' ? 20 : 0
-  const cropBoost = Math.min(30, cropStatuses.length * 8)
-  const peakBoost = cropStatuses.some((crop) => crop.stage === 'PEAK') ? 20 : 0
+  const availableCrops = cropStatuses.filter((crop) => isCurrentlyPickable(crop))
+  const limitedCrops = availableCrops.filter((crop) => crop.latestReport?.condition === 'LIMITED')
+  const cropBoost = Math.min(24, availableCrops.length * 8)
+  const peakBoost = availableCrops.some((crop) => crop.stage === 'PEAK')
+    ? limitedCrops.length > 0
+      ? 8
+      : 18
+    : 0
   const reportBoost = confidence.recentReportCount > 0 ? 15 : 0
-  return Math.min(100, openBoost + cropBoost + peakBoost + reportBoost + Math.round(confidence.score * 0.15))
+  const unavailablePenalty = cropStatuses.some((crop) =>
+    ['SEASON_OVER', 'PICKED_OVER', 'CLOSED'].includes(crop.latestReport?.condition),
+  )
+    ? 12
+    : 0
+  return Math.max(
+    0,
+    Math.min(100, openBoost + cropBoost + peakBoost + reportBoost + Math.round(confidence.score * 0.12) - unavailablePenalty),
+  )
 }
 
 export function worthTheDriveDetails(farm, cropStatuses) {
   const confidence = confidenceForFarm(farm)
   const reasons = []
+  const availableCrops = cropStatuses.filter((crop) => isCurrentlyPickable(crop))
 
   if (confidence.freshness !== null && confidence.freshness <= 3) {
     reasons.push('Fresh official update')
   }
-  if (cropStatuses.some((crop) => crop.stage === 'PEAK')) {
-    reasons.push(`Peak ${cropStatuses.find((crop) => crop.stage === 'PEAK')?.name} season`)
+  if (availableCrops.some((crop) => crop.stage === 'PEAK' && crop.latestReport?.condition === 'LIMITED')) {
+    reasons.push(`${availableCrops.find((crop) => crop.stage === 'PEAK')?.name} is limited but in peak window`)
+  } else if (availableCrops.some((crop) => crop.stage === 'PEAK')) {
+    reasons.push(`Peak ${availableCrops.find((crop) => crop.stage === 'PEAK')?.name} season`)
   }
   if (confidence.score >= 85 || farm.verificationProfile?.confidence >= 90) {
     reasons.push('Excellent confidence')
@@ -131,14 +212,68 @@ export function worthTheDriveDetails(farm, cropStatuses) {
   }
 }
 
+export function isCurrentlyPickable(crop) {
+  if (['SEASON_OVER', 'PICKED_OVER', 'CLOSED'].includes(crop.latestReport?.condition)) {
+    return false
+  }
+  if (['EXCELLENT', 'GOOD', 'LIMITED'].includes(crop.latestReport?.condition)) {
+    return true
+  }
+
+  return ['STARTING', 'PEAK', 'ENDING_SOON'].includes(crop.stage)
+}
+
+function cropLabel(name, plural = false) {
+  const label = String(name || 'crop').toLowerCase()
+  if (!plural) return label
+  if (label.endsWith('berry')) return `${label.slice(0, -1)}ies`
+  if (label.endsWith('s')) return label
+  return `${label}s`
+}
+
+function listNames(names) {
+  if (names.length <= 1) return names[0] || ''
+  if (names.length === 2) return `${names[0]} and ${names[1]}`
+  return `${names.slice(0, -1).join(', ')}, and ${names.at(-1)}`
+}
+
 export function whyVisitToday(farm, cropStatuses) {
-  const available = cropStatuses.filter((crop) => ['STARTING', 'PEAK', 'ENDING_SOON'].includes(crop.stage))
+  const unavailableConditions = ['SEASON_OVER', 'PICKED_OVER', 'CLOSED']
+  const availableConditions = ['EXCELLENT', 'GOOD', 'LIMITED']
+  const unavailable = cropStatuses.filter((crop) =>
+    unavailableConditions.includes(crop.latestReport?.condition) || crop.stage === 'ENDED',
+  )
+  const seasonOver = unavailable.filter((crop) => crop.latestReport?.condition === 'SEASON_OVER')
+  const temporarilyUnavailable = unavailable.filter((crop) => crop.latestReport?.condition !== 'SEASON_OVER')
+  const available = cropStatuses.filter((crop) =>
+    !unavailable.includes(crop) &&
+    (availableConditions.includes(crop.latestReport?.condition) ||
+      ['STARTING', 'PEAK', 'ENDING_SOON'].includes(crop.stage)),
+  )
   const parts = []
 
-  if (available.length > 0) {
-    parts.push(`${available.map((crop) => crop.name).join(', ')} ${available.length === 1 ? 'is' : 'are'} in season`)
+  if (seasonOver.length > 0) {
+    const names = seasonOver.map((crop) => cropLabel(crop.name, true))
+    parts.push(`${listNames(names)} are over for the season`)
   }
-  if (cropStatuses.some((crop) => crop.name === 'Raspberry' && crop.stage === 'PEAK')) {
+
+  if (temporarilyUnavailable.length > 0) {
+    const names = temporarilyUnavailable.map((crop) => cropLabel(crop.name, true))
+    parts.push(`${listNames(names)} are unavailable right now`)
+  }
+
+  if (available.length > 0) {
+    const names = available.map((crop) => cropLabel(crop.name, true))
+    parts.push(`${listNames(names)} ${available.length === 1 ? 'are' : 'are'} now in season`)
+  }
+  if (
+    cropStatuses.some(
+      (crop) =>
+        crop.name === 'Raspberry' &&
+        crop.stage === 'PEAK' &&
+        !unavailableConditions.includes(crop.latestReport?.condition),
+    )
+  ) {
     parts.push('raspberry season is in its peak window')
   }
   if (farm.verificationProfile?.lastResearchedAt) {

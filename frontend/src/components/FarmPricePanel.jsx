@@ -8,6 +8,21 @@ function formatMethod(method) {
     .join(' ')
 }
 
+function formatSource(source) {
+  if (!source) return 'Not listed'
+  const sourceLabels = {
+    FARM_WEBSITE: 'Official Website',
+    FARM_OWNER: 'Farm Owner',
+    MANUAL_RESEARCH: 'Manual Research',
+    GOOGLE_PLACES: 'Google Places',
+    OPENSTREETMAP: 'OpenStreetMap',
+    ADMIN: 'Admin',
+    IMPORT: 'Import',
+  }
+
+  return sourceLabels[source] || formatMethod(source)
+}
+
 export function FarmPricePanel({ prices }) {
   return (
     <section className="farm-panel">
@@ -35,10 +50,10 @@ export function FarmPricePanel({ prices }) {
                   <strong>Source</strong>
                   {price.sourceUrl ? (
                     <a href={price.sourceUrl} rel="noreferrer" target="_blank">
-                      {price.source}
+                      {formatSource(price.source)}
                     </a>
                   ) : (
-                    price.source
+                    formatSource(price.source)
                   )}
                 </span>
                 <span>

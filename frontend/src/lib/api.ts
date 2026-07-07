@@ -22,7 +22,18 @@ function buildUrl(path, params = {}) {
 }
 
 async function request(path, params) {
-  const response = await fetch(buildUrl(path, params))
+  return requestJson(path, { params })
+}
+
+async function requestJson(path, options = {}) {
+  const { params, ...fetchOptions } = options
+  const response = await fetch(buildUrl(path, params), {
+    ...fetchOptions,
+    headers: {
+      ...(fetchOptions.body ? { 'Content-Type': 'application/json' } : {}),
+      ...(fetchOptions.headers || {}),
+    },
+  })
   const payload = await response.json().catch(() => null)
 
   if (!response.ok) {
@@ -54,6 +65,17 @@ export function getHarvestRadar(params = {}) {
 
 export function getHarvestCrop(slug, params = {}) {
   return request(`/api/harvest/${slug}`, params)
+}
+
+export function createFieldObservation(farmId, input) {
+  return requestJson(`/api/admin/farms/${farmId}/field-observations`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  })
+}
+
+export function getRefreshDueEvidence() {
+  return request('/api/admin/evidence/refresh-due')
 }
 
 export { ApiError }

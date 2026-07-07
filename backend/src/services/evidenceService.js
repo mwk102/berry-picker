@@ -12,6 +12,18 @@ const REQUIRED_PROFILE_FIELDS = [
   'cropAvailability',
 ]
 
+const HOT_EVIDENCE_TYPES = new Set(['HARVEST_STATUS', 'CROP_AVAILABILITY', 'HOURS', 'PRICE', 'ANNOUNCEMENT'])
+const FIELD_OBSERVATION_EXPIRY_HOURS = {
+  CLOSED: 24,
+  PICKED_OVER: 36,
+  LIMITED: 24,
+  GOOD: 24,
+  EXCELLENT: 24,
+  COMING_SOON: 72,
+  SEASON_OVER: 168,
+  UNKNOWN: 24,
+}
+
 function serializeEvidence(evidence, now = new Date()) {
   const isExpired = evidence.expiresAt ? new Date(evidence.expiresAt) < now : false
   const isStale =
@@ -56,6 +68,24 @@ function createCompletenessChecks(evidenceRecords) {
   }))
 }
 
+function addHours(date, hours) {
+  return new Date(date.getTime() + hours * 60 * 60 * 1000)
+}
+
+function dueReason(evidence, now = new Date()) {
+  const expiresAt = evidence.expiresAt ? new Date(evidence.expiresAt) : null
+  if (expiresAt && expiresAt < now) return 'expired'
+  if (evidence.confidenceScore < 70) return 'low confidence'
+  if (
+    HOT_EVIDENCE_TYPES.has(evidence.evidenceType) &&
+    expiresAt &&
+    expiresAt.getTime() - now.getTime() < 1000 * 60 * 60 * 24
+  ) {
+    return 'expires soon'
+  }
+  return 'needs review'
+}
+
 function createEvidenceService(evidenceRepository) {
   return {
     async createEvidence(input) {
@@ -90,6 +120,74 @@ function createEvidenceService(evidenceRepository) {
       return { data: serializeEvidence(evidence) }
     },
 
+    async createFieldObservation(input) {
+      if (!input.farmId) throw badRequest('farmId is required')
+      if (!input.farmCropId) throw badRequest('farmCropId is required')
+      if (!input.condition) throw badRequest('condition is required')
+      if (!input.observation) throw badRequest('observation is required')
+
+      const farmCrop = await evidenceRepository.findFarmCrop(input.farmId, input.farmCropId)
+      if (!farmCrop) throw badRequest('farmCropId does not belong to farmId')
+
+      const observedAt = input.observedAt ? new Date(input.observedAt) : new Date()
+      const expiresAt = input.expiresAt
+        ? new Date(input.expiresAt)
+        : addHours(observedAt, FIELD_OBSERVATION_EXPIRY_HOURS[input.condition] || 24)
+      const confidenceScore = Number(input.confidenceScore ?? 90)
+      const sourceName = input.sourceName || 'Admin field observation'
+      const sourceUrl = input.sourceUrl || `field-observation:${farmCrop.farm.slug}:${observedAt.toISOString()}`
+
+      const result = await evidenceRepository.createFieldObservation({
+        evidence: {
+          farmId: input.farmId,
+          farmCropId: input.farmCropId,
+          cropId: farmCrop.cropId,
+          evidenceType: 'HARVEST_STATUS',
+          fieldName: 'harvestStatus',
+          value: String(input.observation),
+          normalizedValue: {
+            condition: input.condition,
+            crowdLevel: input.crowdLevel || 'UNKNOWN',
+            cropSlug: farmCrop.crop.slug,
+            cropName: farmCrop.crop.name,
+            observedFrom: input.observedFrom || 'field_observation',
+          },
+          sourceName,
+          sourceUrl,
+          sourceType: 'FIELD_OBSERVATION',
+          confidenceScore,
+          observedAt,
+          verifiedAt: observedAt,
+          expiresAt,
+          verificationMethod: input.verificationMethod || 'admin_field_observation',
+          notes: input.notes || null,
+        },
+        report: {
+          farmId: input.farmId,
+          farmCropId: input.farmCropId,
+          cropId: farmCrop.cropId,
+          condition: input.condition,
+          crowdLevel: input.crowdLevel || 'UNKNOWN',
+          rating: input.rating ?? null,
+          comment: input.observation,
+          source: 'ADMIN',
+          sourceUrl,
+          verificationMethod: input.verificationMethod || 'admin_field_observation',
+          isVerified: true,
+          isApproved: true,
+          verifiedAt: observedAt,
+          expiresAt,
+        },
+      })
+
+      return {
+        data: {
+          evidence: serializeEvidence(result.evidence),
+          report: result.report,
+        },
+      }
+    },
+
     async listEvidenceForFarm(farmId) {
       const evidence = await evidenceRepository.listEvidenceForFarm(farmId)
       return { data: evidence.map((record) => serializeEvidence(record)) }
@@ -108,6 +206,33 @@ function createEvidenceService(evidenceRepository) {
     async findLowConfidenceEvidence(threshold = 70) {
       const evidence = await evidenceRepository.findLowConfidenceEvidence(Number(threshold))
       return { data: evidence.map((record) => serializeEvidence(record)) }
+    },
+
+    async listRefreshDueEvidence() {
+      const now = new Date()
+      const evidence = await evidenceRepository.listRefreshDueEvidence(now)
+      return {
+        data: evidence.map((record) => ({
+          ...serializeEvidence(record, now),
+          reason: dueReason(record, now),
+          farm: record.farm
+            ? {
+                id: record.farm.id,
+                slug: record.farm.slug,
+                name: record.farm.name,
+                city: record.farm.city,
+                state: record.farm.state,
+              }
+            : null,
+          crop: record.crop
+            ? {
+                id: record.crop.id,
+                slug: record.crop.slug,
+                name: record.crop.name,
+              }
+            : null,
+        })),
+      }
     },
 
     summarizeEvidenceForFarm(evidenceRecords, now = new Date()) {

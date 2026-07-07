@@ -95,7 +95,7 @@ Harvold Berry Farm and Veggies
 
 ## Farm Personality
 
-- Best for: Family Friendly, Quick Berry Trip, Photography, Young Children
+- Best for: Family Friendly, Quick Berry Trip, Photography
 - Known for: Fresh Strawberries, Raspberries, Sunflowers
 
 ## Implementation Notes
