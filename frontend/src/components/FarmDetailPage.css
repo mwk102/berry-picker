@@ -447,6 +447,10 @@
   border-style: dashed;
 }
 
+.nearby-farms-panel {
+  margin-top: var(--space-5);
+}
+
 .why-visit-panel p {
   color: var(--color-forest-900);
   font-size: 1.08rem;
@@ -699,6 +703,10 @@
   padding: var(--space-4);
 }
 
+.nearby-farm-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .harvest-timeline-row strong,
 .nearby-farm-row strong {
   color: var(--color-forest-900);
@@ -914,6 +922,7 @@
   .farm-crop-status,
   .farm-price-row,
   .amenities-grid,
+  .nearby-farm-list,
   .gold-standard-meta,
   .completeness-grid {
     grid-template-columns: 1fr;

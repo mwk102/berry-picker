@@ -150,7 +150,6 @@ export function FarmDetailPage() {
           <FarmPersonalityPanel personality={farm.verificationProfile?.personality} />
           <FarmPricePanel prices={priceRows} />
           <FarmAmenitiesGrid amenities={farm.amenities || []} />
-          <NearbyFarms farms={farm.nearbyFarms || []} />
         </div>
 
         <div className="farm-detail-column">
@@ -158,6 +157,8 @@ export function FarmDetailPage() {
           <FarmReportsList reports={farm.pickingReports || []} />
         </div>
       </div>
+
+      <NearbyFarms farms={farm.nearbyFarms || []} />
     </div>
   )
 }

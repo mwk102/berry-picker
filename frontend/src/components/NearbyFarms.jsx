@@ -4,7 +4,7 @@ export function NearbyFarms({ farms = [] }) {
   return (
     <section className="farm-panel nearby-farms-panel">
       <div className="panel-heading">
-        <h2>Nearby farms</h2>
+        <h2>Nearby alternatives</h2>
       </div>
 
       {farms.length === 0 ? (
@@ -17,8 +17,9 @@ export function NearbyFarms({ farms = [] }) {
             <Link className="nearby-farm-row" key={farm.id} to={`/farms/${farm.slug}`}>
               <strong>{farm.name}</strong>
               <span>
-                {farm.distanceMiles} mi - {farm.sharedCropCount} shared crops - harvest quality{' '}
-                {farm.harvestQualityScore}/5
+                {farm.distanceMiles} mi away
+                {farm.sharedCropCount > 0 ? ` - ${farm.sharedCropCount} shared crops` : ''}
+                {` - harvest signal ${farm.harvestQualityScore}/5`}
               </span>
             </Link>
           ))}
