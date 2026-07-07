@@ -26,6 +26,7 @@ export function HarvestRadarPage() {
 
   const harvestQuery = useHarvestRadar()
   const summaries = harvestQuery.data?.data || []
+  const visibleSummaries = summaries.filter((summary) => summary.activeFarmCount > 0)
 
   if (harvestQuery.error) {
     return (
@@ -41,16 +42,15 @@ export function HarvestRadarPage() {
 
   return (
     <div className="harvest-radar-page">
-      <HarvestHero harvestCount={summaries.length} />
+      <HarvestHero harvestCount={visibleSummaries.length} />
 
       {harvestQuery.isLoading ? (
         <HarvestSkeleton />
-      ) : summaries.length > 0 ? (
-        <HarvestSummaryGrid summaries={summaries} />
+      ) : visibleSummaries.length > 0 ? (
+        <HarvestSummaryGrid summaries={visibleSummaries} />
       ) : (
         <EmptyState title="No harvest signals yet">
-          Harvest summaries will appear here after the backend seed or
-          recalculation job runs.
+          Active crop signals will appear here once farms have current harvest data.
         </EmptyState>
       )}
 
