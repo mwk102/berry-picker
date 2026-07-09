@@ -17,8 +17,11 @@ function createFarmInclude(now = new Date()) {
         orderBy: [{ effectiveStartDate: 'desc' }, { createdAt: 'desc' }],
       },
       reports: {
+        where: {
+          isApproved: true,
+        },
         include: { crop: true },
-        orderBy: { createdAt: 'desc' },
+        orderBy: [{ createdAt: 'desc' }, { updatedAt: 'desc' }],
         take: 3,
       },
     },
@@ -28,8 +31,11 @@ function createFarmInclude(now = new Date()) {
     orderBy: [{ effectiveStartDate: 'desc' }, { createdAt: 'desc' }],
   },
   reports: {
+    where: {
+      isApproved: true,
+    },
     include: { crop: true },
-    orderBy: { createdAt: 'desc' },
+    orderBy: [{ createdAt: 'desc' }, { updatedAt: 'desc' }],
     take: 5,
   },
   announcements: {

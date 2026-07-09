@@ -3,6 +3,7 @@ export function formatDate(value) {
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
+    timeZone: 'UTC',
   }).format(new Date(value))
 }
 
@@ -191,10 +192,10 @@ export function worthTheDriveDetails(farm, cropStatuses) {
   if (confidence.freshness !== null && confidence.freshness <= 3) {
     reasons.push('Fresh official update')
   }
-  if (availableCrops.some((crop) => crop.stage === 'PEAK' && crop.latestReport?.condition === 'LIMITED')) {
-    reasons.push(`${availableCrops.find((crop) => crop.stage === 'PEAK')?.name} is limited but in peak window`)
-  } else if (availableCrops.some((crop) => crop.stage === 'PEAK')) {
+  if (availableCrops.some((crop) => crop.stage === 'PEAK' && crop.latestReport?.condition !== 'LIMITED')) {
     reasons.push(`Peak ${availableCrops.find((crop) => crop.stage === 'PEAK')?.name} season`)
+  } else if (availableCrops.some((crop) => crop.latestReport?.condition === 'LIMITED')) {
+    reasons.push(`${availableCrops.find((crop) => crop.latestReport?.condition === 'LIMITED')?.name} is limited today`)
   }
   if (confidence.score >= 85 || farm.verificationProfile?.confidence >= 90) {
     reasons.push('Excellent confidence')
@@ -239,14 +240,16 @@ function listNames(names) {
 
 export function whyVisitToday(farm, cropStatuses) {
   const unavailableConditions = ['SEASON_OVER', 'PICKED_OVER', 'CLOSED']
-  const availableConditions = ['EXCELLENT', 'GOOD', 'LIMITED']
+  const availableConditions = ['EXCELLENT', 'GOOD']
   const unavailable = cropStatuses.filter((crop) =>
     unavailableConditions.includes(crop.latestReport?.condition) || crop.stage === 'ENDED',
   )
   const seasonOver = unavailable.filter((crop) => crop.latestReport?.condition === 'SEASON_OVER')
   const temporarilyUnavailable = unavailable.filter((crop) => crop.latestReport?.condition !== 'SEASON_OVER')
+  const limited = cropStatuses.filter((crop) => !unavailable.includes(crop) && crop.latestReport?.condition === 'LIMITED')
   const available = cropStatuses.filter((crop) =>
     !unavailable.includes(crop) &&
+    !limited.includes(crop) &&
     (availableConditions.includes(crop.latestReport?.condition) ||
       ['STARTING', 'PEAK', 'ENDING_SOON'].includes(crop.stage)),
   )
@@ -266,11 +269,18 @@ export function whyVisitToday(farm, cropStatuses) {
     const names = available.map((crop) => cropLabel(crop.name, true))
     parts.push(`${listNames(names)} ${available.length === 1 ? 'are' : 'are'} now in season`)
   }
+
+  if (limited.length > 0) {
+    const names = limited.map((crop) => cropLabel(crop.name, true))
+    parts.push(`${listNames(names)} are limited today`)
+  }
+
   if (
     cropStatuses.some(
       (crop) =>
         crop.name === 'Raspberry' &&
         crop.stage === 'PEAK' &&
+        crop.latestReport?.condition !== 'LIMITED' &&
         !unavailableConditions.includes(crop.latestReport?.condition),
     )
   ) {

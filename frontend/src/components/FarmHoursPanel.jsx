@@ -25,11 +25,17 @@ export function FarmHoursPanel({ hours, specialHours }) {
       {specialHours.length > 0 ? (
         <div className="special-hours">
           <strong>Special hours</strong>
-          {specialHours.map((hour) => (
-            <span key={hour.id}>
-              {formatDate(hour.date)} · {hour.isClosed ? 'Closed' : `${formatTime(hour.openTime)} - ${formatTime(hour.closeTime)}`}
-            </span>
-          ))}
+          {specialHours.map((hour) => {
+            const hoursLabel = hour.isClosed
+              ? 'Closed'
+              : `${formatTime(hour.openTime)} - ${formatTime(hour.closeTime)}`
+
+            return (
+              <span key={hour.id}>
+                {formatDate(hour.date)} - {hoursLabel}
+              </span>
+            )
+          })}
         </div>
       ) : null}
     </section>

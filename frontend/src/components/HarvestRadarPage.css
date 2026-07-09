@@ -150,6 +150,16 @@
   color: var(--color-berry);
 }
 
+.season-stage-badge.limited {
+  background: #fff3d8;
+  color: #7b4f16;
+}
+
+.season-stage-badge.unavailable {
+  background: #eef2ef;
+  color: #526159;
+}
+
 .harvest-metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

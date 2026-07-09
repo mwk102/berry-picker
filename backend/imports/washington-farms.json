@@ -137,15 +137,15 @@
     "addressSourceUrl": "https://remlingerfarms.com/",
     "coordinateSourceUrl": "https://www.openstreetmap.org/way/796849039",
     "coordinatesConfidence": 76,
-    "lastVerifiedAt": "2026-07-02T00:00:00.000Z",
-    "verificationConfidence": 88,
+    "lastVerifiedAt": "2026-07-07T16:00:00.000Z",
+    "verificationConfidence": 91,
     "referenceStatus": "VERIFIED",
-    "nextReviewAt": "2026-07-05T00:00:00.000Z",
+    "nextReviewAt": "2026-07-10T15:00:00.000Z",
     "sourceUrls": [
       "https://remlingerfarms.com/",
       "https://www.openstreetmap.org/way/796849039"
     ],
-    "manualNotes": "Reference farm. Official website confirms Carnation campus address, phone, U-pick raspberry update, and seasonal strawberry/pumpkin messaging. Pricing and normal weekly U-pick hours still need source confirmation.",
+    "manualNotes": "Reference farm. Official U-pick page reviewed July 7, 2026 confirms Carnation campus address, phone, temporary raspberry closure/resting update, strawberry season-over status, and seasonal pumpkin messaging. Product-provided official Facebook screenshot from July 5 also says raspberry U-pick is closed for the next few days while fields rest and ripen. Pricing and normal weekly U-pick hours still need source confirmation.",
     "heroImageUrl": "",
     "galleryImages": [],
     "photoAttribution": "Photo placeholder until real farm photos are licensed or owner-provided.",
@@ -160,35 +160,43 @@
       "raspberry": "32610 NE 32nd Street, Carnation, WA 98014"
     },
     "cropNotes": {
-      "raspberry": "Official homepage listed Raspberry U-Pick at the main farm campus for July 2-4, 2026.",
-      "strawberry": "Official homepage indicated strawberry U-pick was closed for the season at the time of review.",
-      "pumpkin": "Official homepage indicated the pumpkin patch was closed and expected back in September 2026."
+      "raspberry": "Official U-pick page and product-provided official Facebook screenshot indicate Raspberry U-pick is closed for the next few days while fields rest and ripen. Recheck before recommending a trip.",
+      "strawberry": "Official U-pick page indicated strawberry U-pick was closed for the season at the time of review.",
+      "pumpkin": "Official U-pick page indicated pumpkin U-pick was closed and expected back in September 2026."
     },
     "currentReports": [
       {
         "cropSlug": "raspberry",
-        "condition": "GOOD",
-        "crowdLevel": "UNKNOWN",
-        "rating": 4,
-        "sourceUrl": "https://remlingerfarms.com/",
-        "comment": "Official homepage update listed Raspberry U-Pick open July 2, 3, and 4 at the main farm campus."
-      },
-      {
-        "cropSlug": "strawberry",
         "condition": "CLOSED",
         "crowdLevel": "UNKNOWN",
         "rating": 1,
-        "sourceUrl": "https://remlingerfarms.com/",
-        "comment": "Official homepage update indicated strawberry U-pick was closed for the season."
+        "sourceUrl": "https://remlingerfarms.com/upick-pumpkin-patch/",
+        "comment": "Official U-pick page and official Facebook update indicate raspberry U-pick is closed for the next few days while fields rest and ripen. Check for the next berry update before heading out."
+      },
+      {
+        "cropSlug": "strawberry",
+        "condition": "SEASON_OVER",
+        "crowdLevel": "UNKNOWN",
+        "rating": 1,
+        "sourceUrl": "https://remlingerfarms.com/upick-pumpkin-patch/",
+        "comment": "Official U-pick page indicated strawberry U-pick was closed for the season."
+      },
+      {
+        "cropSlug": "pumpkin",
+        "condition": "COMING_SOON",
+        "crowdLevel": "UNKNOWN",
+        "rating": 2,
+        "sourceUrl": "https://remlingerfarms.com/upick-pumpkin-patch/",
+        "comment": "Official U-pick page indicated pumpkin U-pick was closed for the season and expected back in September 2026."
       }
     ],
-    "announcementSourceUrl": "https://remlingerfarms.com/",
-    "announcement": "Reference profile seeded from official Remlinger Farms website. Check the farm website before visiting because U-pick crop status is date-sensitive."
+    "announcementSourceUrl": "https://remlingerfarms.com/upick-pumpkin-patch/",
+    "announcement": "Official updates indicate raspberry U-pick is closed for the next few days while fields rest and ripen. Strawberry U-pick is closed for the season; pumpkin U-pick is expected back in September."
   },
   {
     "slug": "henna-blueberry-farm",
     "name": "Henna Blueberry Farm",
-    "description": "Reference blueberry farm in the Snoqualmie River Valley near Carnation, WA. Official website confirms U-pick blueberries, address, and growing-practice notes; hours and pricing need review.",
+    "description": "Reference blueberry farm in the Snoqualmie River Valley near Carnation, WA. Official website confirms U-pick blueberries, address, U-pick hours, U-pick price, and growing-practice notes.",
     "addressLine1": "32500 NE 60th Street",
     "city": "Carnation",
     "state": "WA",
@@ -205,8 +213,8 @@
     "addressSourceUrl": "https://hennablueberryfarm.com/",
     "coordinateSourceUrl": "https://www.openstreetmap.org/way/663084049",
     "coordinatesConfidence": 70,
-    "lastVerifiedAt": "2026-07-02T00:00:00.000Z",
-    "verificationConfidence": 84,
+    "lastVerifiedAt": "2026-07-07T16:00:00.000Z",
+    "verificationConfidence": 90,
     "referenceStatus": "VERIFIED",
     "nextReviewAt": "2026-07-09T00:00:00.000Z",
     "sourceUrls": [
@@ -214,7 +222,7 @@
       "https://hennablueberryfarm.com/u-pick-hours-new/",
       "https://www.openstreetmap.org/way/663084049"
     ],
-    "manualNotes": "Reference farm. Official website confirms U-pick blueberries, Carnation/Snoqualmie River Valley positioning, address, blueberry varieties, U-pick hours, payment flow, and U-pick blueberry price. Phone, amenities, and current field conditions still need review.",
+    "manualNotes": "Reference farm. Official U-pick hours page reviewed July 7, 2026 confirms U-pick blueberries, address, U-pick hours, payment flow, and U-pick blueberry price. Phone, amenities, and live field condition still need review.",
     "heroImageUrl": "",
     "galleryImages": [],
     "photoAttribution": "Photo placeholder until real farm photos are licensed or owner-provided.",
@@ -302,11 +310,11 @@
     "currentReports": [
       {
         "cropSlug": "blueberry",
-        "condition": "UNKNOWN",
+        "condition": "GOOD",
         "crowdLevel": "UNKNOWN",
-        "rating": 3,
+        "rating": 4,
         "sourceUrl": "https://hennablueberryfarm.com/u-pick-hours-new/",
-        "comment": "Official U Pick Hours page lists blueberry U-pick hours and says fields may close early when picked out; call ahead to confirm field availability."
+        "comment": "Official U-pick page lists current blueberry U-pick hours and $3.90/lb pricing; call ahead because fields may close early when picked out."
       }
     ],
     "announcementSourceUrl": "https://hennablueberryfarm.com/u-pick-hours-new/",
@@ -315,7 +323,7 @@
   {
     "slug": "bailey-farm",
     "name": "Bailey Farm",
-    "description": "Reference Pick-Your-Own produce farm in Snohomish, WA. Official website confirms current U-pick strawberry and raspberry pricing, July 2-4 hours, location, phone, and mixed vegetable availability.",
+    "description": "Reference Pick-Your-Own produce farm in Snohomish, WA. Official website confirms current July 7-8 U-pick hours, location, phone, raspberry status, strawberry last-call status, and limited vegetable availability.",
     "addressLine1": "12968 Springhetti Road",
     "city": "Snohomish",
     "state": "WA",
@@ -333,15 +341,15 @@
     "addressSourceUrl": "https://www.baileyveg.com/",
     "coordinateSourceUrl": "https://www.openstreetmap.org/way/700682104",
     "coordinatesConfidence": 78,
-    "lastVerifiedAt": "2026-07-02T00:00:00.000Z",
-    "verificationConfidence": 92,
+    "lastVerifiedAt": "2026-07-07T16:00:00.000Z",
+    "verificationConfidence": 94,
     "referenceStatus": "VERIFIED",
-    "nextReviewAt": "2026-07-05T00:00:00.000Z",
+    "nextReviewAt": "2026-07-09T15:00:00.000Z",
     "sourceUrls": [
       "https://www.baileyveg.com/",
       "https://www.openstreetmap.org/way/700682104"
     ],
-    "manualNotes": "Reference farm. Official website confirms Pick-Your-Own farm name, Snohomish address, phone, July 2-4 U-pick hours, strawberry and raspberry status/pricing, and vegetable availability. Amenities and broader seasonal hours need review.",
+    "manualNotes": "Reference farm. Official website reviewed July 7, 2026 confirms Pick-Your-Own farm name, Snohomish address, phone, July 7-8 U-pick hours, raspberry/strawberry status, and limited vegetable availability. Amenities, current prices, and broader seasonal hours need review.",
     "heroImageUrl": "",
     "galleryImages": [],
     "photoAttribution": "Photo placeholder until real farm photos are licensed or owner-provided.",
@@ -353,42 +361,50 @@
     "cropSlugs": ["strawberry", "raspberry", "vegetables"],
     "amenitySlugs": [],
     "cropNotes": {
-      "strawberry": "Official homepage listed U-pick strawberries open at $4/lb during the July 2-4 update.",
-      "raspberry": "Official homepage listed U-pick raspberries open at $6/lb during the July 2-4 update.",
-      "vegetables": "Official homepage listed several U-pick vegetables open during the July 2-4 update."
+      "strawberry": "Official homepage said July 7 was last call for strawberries and some could still be found.",
+      "raspberry": "Official homepage said raspberries opened again July 7 with good picking in all varieties and would likely close Thursday for ripening.",
+      "vegetables": "Official homepage listed Walla Walla onions, red onions, and spinach available for U-pick; the main vegetable garden was not open yet."
     },
     "priceOverrides": {
       "strawberry": { "priceType": "PER_POUND", "amount": "4.00", "unitLabel": "lb", "notes": "Official homepage listed U-pick strawberries at $4/lb." },
       "raspberry": { "priceType": "PER_POUND", "amount": "6.00", "unitLabel": "lb", "notes": "Official homepage listed U-pick raspberries at $6/lb." }
     },
     "hours": {
-      "openDays": ["THURSDAY", "FRIDAY", "SATURDAY"],
+      "openDays": ["TUESDAY", "WEDNESDAY"],
       "openTime": "08:00",
       "closeTime": "17:30",
-      "closedDays": ["MONDAY", "TUESDAY", "WEDNESDAY", "SUNDAY"],
+      "closedDays": ["MONDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"],
       "sourceUrl": "https://www.baileyveg.com/",
-      "notes": "Official homepage listed U-Pick open Thursday through Saturday, July 2-4, from 8:00am to 5:30pm. Treat as a current update, not guaranteed normal weekly hours."
+      "notes": "Official homepage listed U-Pick open Tuesday and Wednesday, July 7-8, from 8:00am to 5:30pm. Treat as a current update, not guaranteed normal weekly hours."
     },
     "currentReports": [
       {
         "cropSlug": "strawberry",
-        "condition": "GOOD",
+        "condition": "LIMITED",
         "crowdLevel": "UNKNOWN",
-        "rating": 4,
+        "rating": 2,
         "sourceUrl": "https://www.baileyveg.com/",
-        "comment": "Official homepage update listed U-pick strawberries open at $4/lb."
+        "comment": "Official homepage says July 7 is last call for strawberries and some can still be found."
       },
       {
         "cropSlug": "raspberry",
         "condition": "GOOD",
         "crowdLevel": "UNKNOWN",
-        "rating": 4,
+        "rating": 5,
         "sourceUrl": "https://www.baileyveg.com/",
-        "comment": "Official homepage update listed U-pick raspberries open at $6/lb."
+        "comment": "Official homepage says raspberries opened again July 7 with good picking in all varieties, and likely closure Thursday for ripening."
+      },
+      {
+        "cropSlug": "vegetables",
+        "condition": "LIMITED",
+        "crowdLevel": "UNKNOWN",
+        "rating": 3,
+        "sourceUrl": "https://www.baileyveg.com/",
+        "comment": "Official homepage lists Walla Walla onions, red onions, and spinach available for U-pick, while the main vegetable garden is not open yet."
       }
     ],
     "announcementSourceUrl": "https://www.baileyveg.com/",
-    "announcement": "Reference profile seeded from official Bailey Farm website. Current U-pick hours and availability should be reviewed before each busy weekend."
+    "announcement": "Official homepage lists Bailey Farm open July 7 and 8 from 8:00 AM to 5:30 PM. Raspberries have good picking, strawberries are last call, and onions/spinach are available while the main vegetable garden is still coming soon."
   },
   {
     "slug": "bells-farm",
@@ -411,16 +427,16 @@
     "addressSourceUrl": "https://www.bells-farm.com/",
     "coordinateSourceUrl": "manual address research from 892 West Beach Rd, Coupeville, WA 98239",
     "coordinatesConfidence": 62,
-    "lastVerifiedAt": "2026-07-02T00:00:00.000Z",
-    "verificationConfidence": 82,
-    "referenceStatus": "VERIFIED",
-    "nextReviewAt": "2026-07-09T00:00:00.000Z",
+    "lastVerifiedAt": "2026-07-07T16:00:00.000Z",
+    "verificationConfidence": 84,
+    "referenceStatus": "NEEDS_REVIEW",
+    "nextReviewAt": "2026-07-14T15:00:00.000Z",
     "sourceUrls": [
       "https://www.bells-farm.com/",
       "https://www.whidbeyislandgrown.com/bells-farm",
       "https://www.facebook.com/bellsfarmwhidbey/"
     ],
-    "manualNotes": "Reference farm. Official website confirms name, address, phone, farm stand, flowers, and growing-practice claims. Whidbey Island Grown profile confirms strawberries, vegetables, farm stand, and Whidbey/Coupeville context. Facebook page was identified but not readable in this environment, so no facts were verified from Facebook. Current U-pick berry status, hours, and pricing need review.",
+    "manualNotes": "Reference farm. Official and cooperative sources re-reviewed July 7, 2026. Official website confirms name, address, phone, farm stand, flowers, and growing-practice claims. Whidbey Island Grown profile confirms strawberries, vegetables, farm stand, and Whidbey/Coupeville context. Facebook page was identified but not readable in this environment, so no facts were verified from Facebook. Current U-pick berry status, hours, and pricing need review.",
     "heroImageUrl": "",
     "galleryImages": [],
     "photoAttribution": "Photo placeholder until real farm photos are licensed or owner-provided.",

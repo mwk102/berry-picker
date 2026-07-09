@@ -16,6 +16,22 @@ function reportText(report) {
   return `${formatReportCondition(report.condition)}${freshness === null ? '' : ` - ${freshness}d old`}`
 }
 
+function currentBadgeStage(farmCrop, latestReport) {
+  if (!latestReport?.condition || latestReport.condition === 'UNKNOWN') return farmCrop.stage
+
+  const reportStageMap = {
+    EXCELLENT: farmCrop.stage,
+    GOOD: farmCrop.stage,
+    LIMITED: 'LIMITED',
+    PICKED_OVER: 'UNAVAILABLE',
+    CLOSED: 'UNAVAILABLE',
+    SEASON_OVER: 'ENDED',
+    COMING_SOON: 'COMING_SOON',
+  }
+
+  return reportStageMap[latestReport.condition] || farmCrop.stage
+}
+
 export function FarmCropStatusList({ cropStatuses }) {
   return (
     <section className="farm-panel">
@@ -37,7 +53,7 @@ export function FarmCropStatusList({ cropStatuses }) {
                   {formatDate(farmCrop.seasonStartDate)} - {formatDate(farmCrop.seasonEndDate)}
                 </span>
               </div>
-              <SeasonStageBadge stage={farmCrop.stage} />
+              <SeasonStageBadge stage={currentBadgeStage(farmCrop, latestReport)} />
               <span>{reportText(latestReport)}</span>
               <span>{formatPrice(latestPrice)}</span>
               <span>Confidence {farmCrop.confidenceScore}/100</span>

@@ -17,14 +17,15 @@ Bailey Farm is a Pick-Your-Own produce farm in Snohomish, WA with official curre
 - Phone: 360-568-8826
 - Website: https://www.baileyveg.com/
 - Official site identifies the farm as Pick-Your-Own Produce in Snohomish, WA.
-- Current official update reviewed July 2, 2026 listed U-pick open July 2-4 from 8:00am to 5:30pm.
-- Current official update listed strawberries open at $4/lb.
-- Current official update listed raspberries open at $6/lb.
-- Current official update listed mixed vegetable availability.
+- Current official update reviewed July 7, 2026 listed the farm open Tuesday and Wednesday, July 7 and 8, from 8:00am to 5:30pm.
+- Current official update reviewed July 7, 2026 said raspberries opened again with good picking in all varieties and would likely close Thursday for ripening.
+- Current official update reviewed July 7, 2026 said strawberries were last call and some could still be found.
+- Current official update reviewed July 7, 2026 listed Walla Walla onions, red onions, and spinach available for U-pick, while the main vegetable garden was coming soon.
+- Earlier official pricing evidence remains stored for strawberries and raspberries, but the July 7 homepage update did not repeat prices in the reviewed text.
 
 ## Missing Fields
 
-- Normal weekly/seasonal hours outside the current July 2-4 update
+- Normal weekly/seasonal hours outside the current July 7-8 update
 - Structured amenities
 - Field-specific crop locations
 - Real photos and attribution
@@ -33,5 +34,5 @@ Bailey Farm is a Pick-Your-Own produce farm in Snohomish, WA with official curre
 ## Notes For Future Review
 
 - Current updates should expire quickly.
+- Recheck July 9, 2026 because the official update says the farm will likely close again Thursday for raspberry ripening.
 - Add individual vegetable crops later if Farm Finder and Harvest Radar need vegetable-specific pages.
-

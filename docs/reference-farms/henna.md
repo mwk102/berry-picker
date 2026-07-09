@@ -2,7 +2,7 @@
 
 ## Why This Farm Is a Reference Farm
 
-Henna Blueberry Farm is a focused blueberry U-pick farm in the Snoqualmie River Valley. It is a good reference farm for single-crop seasonal availability, crop variety notes, and explicit uncertainty around missing prices and hours.
+Henna Blueberry Farm is a focused blueberry U-pick farm in the Snoqualmie River Valley. It is a good reference farm for single-crop seasonal availability, crop variety notes, and clear separation between posted U-pick hours and live field condition.
 
 ## Source URLs
 
@@ -25,6 +25,7 @@ Henna Blueberry Farm is a focused blueberry U-pick farm in the Snoqualmie River 
 - Official U-pick page lists Tuesday through Thursday morning and evening picking windows.
 - Official U-pick page lists Friday through Sunday morning picking windows.
 - Official U-pick page says fields may close early when picked out and recommends calling ahead on weekends.
+- Official U-pick page was re-reviewed July 7, 2026 and remains the source for current hours and pricing.
 
 ## Missing Fields
 
@@ -38,3 +39,4 @@ Henna Blueberry Farm is a focused blueberry U-pick farm in the Snoqualmie River 
 
 - Do not mark the farm organic; the official website says it is not certified organic.
 - Keep current field condition separate from posted U-pick hours because the official page warns fields may close early when picked out.
+- Recheck at least weekly during blueberry season, and sooner before weekends.

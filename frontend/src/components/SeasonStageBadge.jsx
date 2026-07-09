@@ -4,6 +4,8 @@ const stageLabels = {
   PEAK: 'Peak',
   ENDING_SOON: 'Ending soon',
   ENDED: 'Ended',
+  LIMITED: 'Limited',
+  UNAVAILABLE: 'Unavailable',
   UNKNOWN: 'Unknown',
 }
 

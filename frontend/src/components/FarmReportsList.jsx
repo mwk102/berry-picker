@@ -25,18 +25,42 @@ function reportConditionLabel(report) {
   return parts.join(' - ')
 }
 
+function reportPriority(report) {
+  const priorities = {
+    CLOSED: 0,
+    PICKED_OVER: 1,
+    LIMITED: 2,
+    EXCELLENT: 3,
+    GOOD: 4,
+    SEASON_OVER: 5,
+    COMING_SOON: 6,
+    UNKNOWN: 7,
+  }
+
+  return priorities[report.condition] ?? 8
+}
+
 export function FarmReportsList({ reports }) {
+  const visibleReports = [...reports]
+    .filter((report) => report.isApproved !== false)
+    .sort(
+      (first, second) =>
+        new Date(second.createdAt) - new Date(first.createdAt) ||
+        reportPriority(first) - reportPriority(second) ||
+        (first.crop?.name || '').localeCompare(second.crop?.name || ''),
+    )
+
   return (
     <section className="farm-panel">
       <div className="panel-heading">
         <h2>Recent picking reports</h2>
       </div>
 
-      {reports.length === 0 ? (
+      {visibleReports.length === 0 ? (
         <p className="panel-muted">No recent picking reports yet.</p>
       ) : (
         <div className="farm-reports-list">
-          {reports.map((report) => {
+          {visibleReports.map((report) => {
             const freshness = reportFreshnessDays(report)
             const conditionLabel = reportConditionLabel(report)
 
