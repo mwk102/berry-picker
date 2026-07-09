@@ -9,8 +9,31 @@ function parseRefresh(value) {
   throw badRequest('refresh must be either true or false')
 }
 
-function createHarvestRouter(harvestRadarService, harvestSignalsService) {
+function createHarvestRouter(harvestRadarService, harvestSignalsService, dailyHarvestService) {
   const router = express.Router()
+
+  router.get('/daily', async (_req, res, next) => {
+    try {
+      const result = await dailyHarvestService.getLatestDailySummary()
+      res.json(result)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  router.get('/events', async (req, res, next) => {
+    try {
+      const limit = req.query.limit ? Number(req.query.limit) : 20
+      if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+        throw badRequest('limit must be an integer between 1 and 100')
+      }
+      const includeInternal = req.query.includeInternal === 'true'
+      const result = await dailyHarvestService.listEvents({ limit, publicOnly: !includeInternal })
+      res.json(result)
+    } catch (error) {
+      next(error)
+    }
+  })
 
   router.get('/signals', async (_req, res, next) => {
     try {

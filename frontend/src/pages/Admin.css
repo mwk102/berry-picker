@@ -215,9 +215,49 @@
   margin: var(--space-2) 0 0;
 }
 
+.daily-cycle-panel {
+  margin-top: var(--space-6);
+}
+
+.daily-cycle-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.daily-cycle-grid span,
+.daily-cycle-events article {
+  display: grid;
+  gap: 4px;
+  border: 1px solid rgba(47, 111, 70, 0.14);
+  border-radius: var(--radius-md);
+  background: var(--color-mint-50);
+  padding: var(--space-3);
+}
+
+.daily-cycle-grid strong,
+.daily-cycle-events strong {
+  color: var(--color-forest-900);
+}
+
+.daily-cycle-events {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.daily-cycle-events span {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
 @media (max-width: 860px) {
   .admin-grid,
   .admin-form-row,
+  .daily-cycle-grid,
+  .daily-cycle-events,
   .admin-page .gold-standard-meta,
   .admin-page .completeness-grid {
     grid-template-columns: 1fr;

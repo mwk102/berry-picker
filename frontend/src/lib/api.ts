@@ -67,6 +67,18 @@ export function getHarvestCrop(slug, params = {}) {
   return request(`/api/harvest/${slug}`, params)
 }
 
+export function getDailyHarvest() {
+  return request('/api/harvest/daily')
+}
+
+export function getHarvestEvents(params = {}) {
+  return request('/api/harvest/events', params)
+}
+
+export function getAdminDailyCycle() {
+  return request('/api/admin/daily-cycle')
+}
+
 export function createFieldObservation(farmId, input) {
   return requestJson(`/api/admin/farms/${farmId}/field-observations`, {
     method: 'POST',

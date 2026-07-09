@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createFieldObservation, getFarms, getRefreshDueEvidence } from '../lib/api'
+import { createFieldObservation, getAdminDailyCycle, getFarms, getRefreshDueEvidence } from '../lib/api'
 import { EvidencePanel } from '../components/EvidencePanel'
 import { confidenceForFarm } from '../components/FarmDetailUtils'
 import { FarmConfidencePanel } from '../components/FarmConfidencePanel'
@@ -48,6 +48,10 @@ export function Admin() {
   const refreshDueQuery = useQuery({
     queryKey: ['admin-refresh-due'],
     queryFn: getRefreshDueEvidence,
+  })
+  const dailyCycleQuery = useQuery({
+    queryKey: ['admin-daily-cycle'],
+    queryFn: getAdminDailyCycle,
   })
   const farms = farmsQuery.data?.data || []
   const [farmId, setFarmId] = useState('')
@@ -237,6 +241,45 @@ export function Admin() {
           ) : null}
         </aside>
       </div>
+
+      <section className="admin-panel daily-cycle-panel">
+        <div className="admin-panel-heading">
+          <h2>Daily Cycle</h2>
+          <span>{dailyCycleQuery.data?.data?.events?.length || 0} events today</span>
+        </div>
+        {dailyCycleQuery.isLoading ? <p>Loading daily cycle...</p> : null}
+        {dailyCycleQuery.error ? <p className="admin-error">{dailyCycleQuery.error.message}</p> : null}
+        {dailyCycleQuery.data?.data ? (
+          <div className="daily-cycle-grid">
+            <span>
+              <strong>Last summary</strong>
+              {dailyCycleQuery.data.data.summary?.headline || 'No summary generated yet'}
+            </span>
+            <span>
+              <strong>Stale evidence</strong>
+              {dailyCycleQuery.data.data.staleEvidenceCount}
+            </span>
+            <span>
+              <strong>Refresh due</strong>
+              {dailyCycleQuery.data.data.refreshDueCount}
+            </span>
+            <span>
+              <strong>Generated</strong>
+              {dailyCycleQuery.data.data.summary?.generatedAt
+                ? new Date(dailyCycleQuery.data.data.summary.generatedAt).toLocaleString()
+                : 'Not generated'}
+            </span>
+          </div>
+        ) : null}
+        <div className="daily-cycle-events">
+          {(dailyCycleQuery.data?.data?.events || []).slice(0, 5).map((event) => (
+            <article key={event.id}>
+              <strong>{event.title}</strong>
+              <span>{event.farm?.name || event.crop?.name || event.eventType}</span>
+            </article>
+          ))}
+        </div>
+      </section>
 
       <div className="admin-review-grid">
         {selectedFarm ? (

@@ -92,8 +92,16 @@ function validateFieldObservationBody(farmId, body) {
   }
 }
 
-function createAdminEvidenceRouter(evidenceService) {
+function createAdminEvidenceRouter(evidenceService, dailyHarvestService) {
   const router = express.Router()
+
+  router.get('/daily-cycle', async (_req, res, next) => {
+    try {
+      res.json(await dailyHarvestService.getAdminCycle())
+    } catch (error) {
+      next(error)
+    }
+  })
 
   // TODO(auth-required): protect all admin evidence routes before production.
   router.get('/farms/:farmId/evidence', async (req, res, next) => {

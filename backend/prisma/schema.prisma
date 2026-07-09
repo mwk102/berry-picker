@@ -165,6 +165,20 @@ enum EvidenceSourceType {
   IMPORT
 }
 
+enum HarvestEventType {
+  CROP_ENTERED_PEAK
+  CROP_ENDING_SOON
+  CROP_SEASON_OVER
+  FARM_REOPENED
+  FARM_CLOSED
+  PRICE_CHANGED
+  FRESH_REPORT_RECEIVED
+  EVIDENCE_EXPIRED
+  RECOMMENDATION_CHANGED
+  WEATHER_NOTE
+  GENERAL
+}
+
 model User {
   id           String   @id @default(uuid()) @db.Uuid
   name         String?
@@ -213,17 +227,19 @@ model Farm {
   createdAt      DateTime              @default(now())
   updatedAt      DateTime              @updatedAt
 
-  farmCrops     FarmCrop[]
-  hours         FarmHour[]
-  specialHours  SpecialHour[]
-  amenities     FarmAmenity[]
-  cropPrices    CropPrice[]
-  reports       PickingReport[]
-  announcements Announcement[]
-  sources       FarmSource[]
-  candidates    CandidateFarm[]
-  verification  FarmVerificationProfile?
-  evidence      Evidence[]
+  farmCrops                 FarmCrop[]
+  hours                     FarmHour[]
+  specialHours              SpecialHour[]
+  amenities                 FarmAmenity[]
+  cropPrices                CropPrice[]
+  reports                   PickingReport[]
+  announcements             Announcement[]
+  sources                   FarmSource[]
+  candidates                CandidateFarm[]
+  verification              FarmVerificationProfile?
+  evidence                  Evidence[]
+  recommendedDailySummaries DailyHarvestSummary[]    @relation("RecommendedFarm")
+  harvestEvents             HarvestEvent[]
 
   @@index([city])
   @@index([state])
@@ -284,9 +300,10 @@ model Evidence {
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
-  farm     Farm      @relation(fields: [farmId], references: [id], onDelete: Restrict)
-  farmCrop FarmCrop? @relation(fields: [farmCropId], references: [id], onDelete: SetNull)
-  crop     Crop?     @relation(fields: [cropId], references: [id], onDelete: SetNull)
+  farm          Farm           @relation(fields: [farmId], references: [id], onDelete: Restrict)
+  farmCrop      FarmCrop?      @relation(fields: [farmCropId], references: [id], onDelete: SetNull)
+  crop          Crop?          @relation(fields: [cropId], references: [id], onDelete: SetNull)
+  harvestEvents HarvestEvent[]
 
   @@index([farmId])
   @@index([farmCropId])
@@ -361,11 +378,13 @@ model Crop {
   createdAt               DateTime     @default(now())
   updatedAt               DateTime     @updatedAt
 
-  farmCrops      FarmCrop[]
-  cropPrices     CropPrice[]
-  reports        PickingReport[]
-  harvestSummary HarvestSummary?
-  evidence       Evidence[]
+  farmCrops                 FarmCrop[]
+  cropPrices                CropPrice[]
+  reports                   PickingReport[]
+  harvestSummary            HarvestSummary?
+  evidence                  Evidence[]
+  recommendedDailySummaries DailyHarvestSummary[] @relation("RecommendedCrop")
+  harvestEvents             HarvestEvent[]
 
   @@index([category])
   @@index([isActive])
@@ -391,6 +410,56 @@ model HarvestSummary {
   @@index([confidence])
   @@index([bestRegion])
   @@index([calculatedAt])
+}
+
+model DailyHarvestSummary {
+  id                String   @id @default(uuid()) @db.Uuid
+  summaryDate       DateTime @db.Date
+  region            String?
+  headline          String
+  body              String
+  highlightsJson    Json
+  recommendedFarmId String?  @db.Uuid
+  recommendedCropId String?  @db.Uuid
+  confidenceScore   Int      @default(0)
+  freshnessScore    Int      @default(0)
+  generatedAt       DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  recommendedFarm Farm? @relation("RecommendedFarm", fields: [recommendedFarmId], references: [id], onDelete: SetNull)
+  recommendedCrop Crop? @relation("RecommendedCrop", fields: [recommendedCropId], references: [id], onDelete: SetNull)
+
+  @@unique([summaryDate, region])
+  @@index([summaryDate])
+  @@index([region])
+  @@index([recommendedFarmId])
+  @@index([recommendedCropId])
+}
+
+model HarvestEvent {
+  id               String           @id @default(uuid()) @db.Uuid
+  eventDate        DateTime         @db.Date
+  farmId           String?          @db.Uuid
+  cropId           String?          @db.Uuid
+  eventType        HarvestEventType
+  title            String
+  description      String
+  sourceEvidenceId String?          @db.Uuid
+  confidenceScore  Int              @default(0)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  farm           Farm?     @relation(fields: [farmId], references: [id], onDelete: SetNull)
+  crop           Crop?     @relation(fields: [cropId], references: [id], onDelete: SetNull)
+  sourceEvidence Evidence? @relation(fields: [sourceEvidenceId], references: [id], onDelete: SetNull)
+
+  @@unique([eventDate, eventType, farmId, cropId, title])
+  @@index([eventDate])
+  @@index([eventType])
+  @@index([farmId])
+  @@index([cropId])
+  @@index([sourceEvidenceId])
 }
 
 model FarmCrop {

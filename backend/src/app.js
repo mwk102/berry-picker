@@ -11,6 +11,7 @@ const { createEvidenceService } = require('./services/evidenceService')
 const { createFarmService } = require('./services/farmService')
 const { createHarvestRadarService } = require('./services/harvestRadarService')
 const { createHarvestSignalsService } = require('./services/harvestSignalsService')
+const { createDailyHarvestService } = require('./services/dailyHarvestService')
 const { createSearchService } = require('./services/searchService')
 const { createCropRouter } = require('./routes/crops')
 const { createAdminEvidenceRouter } = require('./routes/adminEvidence')
@@ -33,6 +34,7 @@ function createApp() {
   const evidenceService = createEvidenceService(evidenceRepository)
   const harvestRadarService = createHarvestRadarService(harvestRepository)
   const harvestSignalsService = createHarvestSignalsService(harvestRepository)
+  const dailyHarvestService = createDailyHarvestService(prisma, harvestRadarService)
   const searchService = createSearchService(farmService, cropRepository)
 
   app.get('/api/health', (_req, res) => {
@@ -41,9 +43,9 @@ function createApp() {
 
   app.use('/api/farms', createFarmRouter(farmService))
   app.use('/api/crops', createCropRouter(cropService))
-  app.use('/api/harvest', createHarvestRouter(harvestRadarService, harvestSignalsService))
+  app.use('/api/harvest', createHarvestRouter(harvestRadarService, harvestSignalsService, dailyHarvestService))
   app.use('/api/search', createSearchRouter(searchService))
-  app.use('/api/admin', createAdminEvidenceRouter(evidenceService))
+  app.use('/api/admin', createAdminEvidenceRouter(evidenceService, dailyHarvestService))
 
   app.use(notFoundHandler)
   app.use(errorHandler)

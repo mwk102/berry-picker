@@ -1,8 +1,10 @@
 import { EmptyState } from './EmptyState'
+import { DailyHarvestSummary } from './DailyHarvestSummary'
+import { HarvestEventsList } from './HarvestEventsList'
 import { HarvestHero } from './HarvestHero'
 import { HarvestSummaryGrid } from './HarvestSummaryGrid'
 import { WeekendOutlookPlaceholder } from './WeekendOutlookPlaceholder'
-import { useHarvestRadar } from '../hooks/useHarvestRadar'
+import { useDailyHarvest, useHarvestEvents, useHarvestRadar } from '../hooks/useHarvestRadar'
 import { usePageTitle } from '../hooks/usePageTitle'
 import './HarvestRadarPage.css'
 
@@ -25,6 +27,8 @@ export function HarvestRadarPage() {
   usePageTitle('Harvest Radar')
 
   const harvestQuery = useHarvestRadar()
+  const dailyQuery = useDailyHarvest()
+  const eventsQuery = useHarvestEvents({ limit: 12 })
   const summaries = harvestQuery.data?.data || []
   const visibleSummaries = summaries.filter((summary) => summary.activeFarmCount > 0)
 
@@ -43,6 +47,16 @@ export function HarvestRadarPage() {
   return (
     <div className="harvest-radar-page">
       <HarvestHero harvestCount={visibleSummaries.length} />
+
+      <DailyHarvestSummary
+        isLoading={dailyQuery.isLoading}
+        summary={dailyQuery.data?.data}
+      />
+
+      <HarvestEventsList
+        events={eventsQuery.data?.data || []}
+        isLoading={eventsQuery.isLoading}
+      />
 
       {harvestQuery.isLoading ? (
         <HarvestSkeleton />

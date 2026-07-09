@@ -12,6 +12,7 @@
     "db:reset": "prisma migrate reset",
     "db:seed": "tsx prisma/seed.ts",
     "refresh:due": "node scripts/refresh-due.js",
+    "harvest:daily": "node scripts/harvest-daily.js",
     "import:candidates": "tsx imports/candidate-sources/import-candidates.ts",
     "import:google-candidates": "tsx imports/candidate-sources/import-google-candidates.ts",
     "import:osm-candidates": "tsx imports/candidate-sources/import-osm-candidates.ts",
