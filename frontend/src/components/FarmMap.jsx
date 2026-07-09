@@ -152,7 +152,7 @@ export function FarmMap({ farms = [], onSelectFarm, selectedFarm }) {
                       className={`popup-crop-status ${cropRow.availability?.status || 'unknown'}`}
                       key={cropRow.cropSlug || cropRow.cropName}
                     >
-                      <BerryChip>{cropRow.cropName}</BerryChip>
+                      <BerryChip crop={cropRow.crop}>{cropRow.cropName}</BerryChip>
                       {cropRow.availability?.label ? <em>{cropRow.availability.label}</em> : null}
                     </span>
                   ))}

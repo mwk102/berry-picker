@@ -17,7 +17,7 @@ Remlinger Farms is a major public farm destination in Carnation, WA with officia
 - Phone: 425-333-4135 ext 250
 - Website: https://remlingerfarms.com/
 - Crops with official U-pick/status evidence: raspberry, strawberry, pumpkin
-- Current official update reviewed July 7, 2026: raspberry U-pick is closed for the next few days while fields rest and ripen. This was backed by the official U-pick page and a product-provided screenshot of Remlinger Farms' official Facebook update from July 5, 2026.
+- Current official update reviewed July 8, 2026: raspberry U-pick is open Wednesday July 8 from 9:00 AM to 5:00 PM. This was backed by the official U-pick page and a product-provided official update graphic.
 - Current official update reviewed July 7, 2026: strawberry U-pick was listed as closed for the season.
 - Current official update reviewed July 7, 2026: pumpkin U-pick was listed as closed for the season and expected back in September 2026.
 - Amenities/attractions with official support: family-friendly farm destination, farm market/cafe/brewery context.
@@ -33,5 +33,5 @@ Remlinger Farms is a major public farm destination in Carnation, WA with officia
 ## Notes For Future Review
 
 - Treat all crop availability as short-lived evidence.
-- Recheck by July 10, 2026 because the raspberry closure is temporary and the farm said to wait for the next berry update before heading out.
+- Recheck July 9, 2026 because the raspberry opening is a same-day picking window.
 - Keep amusement/family-fun content separate from U-pick harvest confidence.

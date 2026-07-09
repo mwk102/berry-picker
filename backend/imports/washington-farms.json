@@ -54,15 +54,15 @@
       "contactSourceUrl": "https://harvoldberryfarm.com/contact-us",
       "addressSourceUrl": "https://harvoldberryfarm.com/contact-us",
       "referenceStatus": "GOLD_STANDARD",
-      "lastVerifiedAt": "2026-07-02T00:00:00.000Z",
-      "verificationConfidence": 95,
-      "nextReviewAt": "2026-07-09T00:00:00.000Z",
+      "lastVerifiedAt": "2026-07-08T16:00:00.000Z",
+      "verificationConfidence": 96,
+      "nextReviewAt": "2026-07-11T15:00:00.000Z",
       "sourceUrls": [
         "https://harvoldberryfarm.com/",
         "https://harvoldberryfarm.com/location-%26-price",
         "https://harvoldberryfarm.com/contact-us"
       ],
-      "manualNotes": "Gold Standard reference farm. Official website confirms farm name, Carnation location, phone, current berry updates, hours, field addresses, and strawberry/raspberry prices. Field availability can change when picked out.",
+      "manualNotes": "Gold Standard reference farm. Official website confirms farm name, Carnation location, phone, field addresses, and strawberry/raspberry prices. Official homepage reviewed July 8, 2026 says strawberry season is closed for 2026 and raspberry is closed with next picking Saturday July 11. Product-provided official update graphic says raspberry picking is 8 AM to 1 PM or picked out, whichever comes first.",
       "heroImageUrl": "",
       "galleryImages": [],
       "photoAttribution": "Photo placeholder until real farm photos are licensed or owner-provided.",
@@ -79,8 +79,8 @@
       "sunflower": "5207 Carnation-Duvall Rd NE, Carnation, WA 98014"
     },
     "cropNotes": {
-      "strawberry": "Official site lists strawberry field at 7701 Carnation Duvall Rd NE. Look for big yellow signs.",
-      "raspberry": "Official site lists raspberry field at 5207 Carnation-Duvall Rd NE. Five-pound minimum noted for raspberry season.",
+      "strawberry": "Official site lists strawberry field at 7701 Carnation Duvall Rd NE. Look for big yellow signs. Official homepage says strawberry season is closed for 2026.",
+      "raspberry": "Official site lists raspberry field at 5207 Carnation-Duvall Rd NE. Five-pound minimum noted for raspberry season. Official homepage says raspberry is closed with next picking Saturday July 11.",
       "sunflower": "Official site lists sunflower and veggie fields at 5207 Carnation-Duvall Rd NE."
     },
     "priceOverrides": {
@@ -98,23 +98,23 @@
     "currentReports": [
       {
         "cropSlug": "strawberry",
-          "condition": "GOOD",
+          "condition": "SEASON_OVER",
           "crowdLevel": "UNKNOWN",
-          "rating": 4,
+          "rating": 1,
           "sourceUrl": "https://harvoldberryfarm.com/",
-          "comment": "Official homepage update: strawberry field at 7701 Carnation Duvall Rd NE; open during posted berry hours unless picked out."
+          "comment": "Official homepage update says strawberry season is closed for 2026."
         },
       {
         "cropSlug": "raspberry",
-          "condition": "LIMITED",
+          "condition": "CLOSED",
           "crowdLevel": "UNKNOWN",
-          "rating": 3,
+          "rating": 2,
           "sourceUrl": "https://harvoldberryfarm.com/",
-          "comment": "Official homepage update noted raspberry picking at 5207 Carnation Duvall Rd NE and a next-picking update around July 1."
+          "comment": "Official homepage update says raspberry is closed, with next picking Saturday July 11 at 5207 Carnation-Duvall Rd NE. Official update graphic says 8 AM to 1 PM or picked out, whichever comes first."
         }
       ],
       "announcementSourceUrl": "https://harvoldberryfarm.com/",
-      "announcement": "Verified from official Harvold Berry Farm website. Check the farm website before visiting because berry fields may close when picked out."
+      "announcement": "Official update: raspberry is closed now. Next raspberry picking is Saturday July 11 from 8 AM to 1 PM at 5207 Carnation-Duvall Rd NE, or until picked out. Strawberry season is closed for 2026."
   },
   {
     "slug": "remlinger-farms",
@@ -137,15 +137,15 @@
     "addressSourceUrl": "https://remlingerfarms.com/",
     "coordinateSourceUrl": "https://www.openstreetmap.org/way/796849039",
     "coordinatesConfidence": 76,
-    "lastVerifiedAt": "2026-07-07T16:00:00.000Z",
-    "verificationConfidence": 91,
+    "lastVerifiedAt": "2026-07-08T16:00:00.000Z",
+    "verificationConfidence": 92,
     "referenceStatus": "VERIFIED",
-    "nextReviewAt": "2026-07-10T15:00:00.000Z",
+    "nextReviewAt": "2026-07-09T15:00:00.000Z",
     "sourceUrls": [
       "https://remlingerfarms.com/",
       "https://www.openstreetmap.org/way/796849039"
     ],
-    "manualNotes": "Reference farm. Official U-pick page reviewed July 7, 2026 confirms Carnation campus address, phone, temporary raspberry closure/resting update, strawberry season-over status, and seasonal pumpkin messaging. Product-provided official Facebook screenshot from July 5 also says raspberry U-pick is closed for the next few days while fields rest and ripen. Pricing and normal weekly U-pick hours still need source confirmation.",
+    "manualNotes": "Reference farm. Official U-pick page reviewed July 8, 2026 confirms Carnation campus address, phone, raspberry U-pick open Wednesday July 8 from 9 AM to 5 PM, strawberry season-over status, and seasonal pumpkin messaging. Pricing and normal weekly U-pick hours still need source confirmation.",
     "heroImageUrl": "",
     "galleryImages": [],
     "photoAttribution": "Photo placeholder until real farm photos are licensed or owner-provided.",
@@ -160,18 +160,18 @@
       "raspberry": "32610 NE 32nd Street, Carnation, WA 98014"
     },
     "cropNotes": {
-      "raspberry": "Official U-pick page and product-provided official Facebook screenshot indicate Raspberry U-pick is closed for the next few days while fields rest and ripen. Recheck before recommending a trip.",
+      "raspberry": "Official U-pick page and product-provided official update graphic indicate Raspberry U-pick is open Wednesday July 8 from 9:00 AM to 5:00 PM.",
       "strawberry": "Official U-pick page indicated strawberry U-pick was closed for the season at the time of review.",
       "pumpkin": "Official U-pick page indicated pumpkin U-pick was closed and expected back in September 2026."
     },
     "currentReports": [
       {
         "cropSlug": "raspberry",
-        "condition": "CLOSED",
+        "condition": "GOOD",
         "crowdLevel": "UNKNOWN",
-        "rating": 1,
+        "rating": 4,
         "sourceUrl": "https://remlingerfarms.com/upick-pumpkin-patch/",
-        "comment": "Official U-pick page and official Facebook update indicate raspberry U-pick is closed for the next few days while fields rest and ripen. Check for the next berry update before heading out."
+        "comment": "Official U-pick page and official update graphic list raspberry U-pick open Wednesday July 8 from 9:00 AM to 5:00 PM."
       },
       {
         "cropSlug": "strawberry",
@@ -191,7 +191,7 @@
       }
     ],
     "announcementSourceUrl": "https://remlingerfarms.com/upick-pumpkin-patch/",
-    "announcement": "Official updates indicate raspberry U-pick is closed for the next few days while fields rest and ripen. Strawberry U-pick is closed for the season; pumpkin U-pick is expected back in September."
+    "announcement": "Official update: raspberry U-pick is open Wednesday July 8 from 9:00 AM to 5:00 PM. Strawberry U-pick is closed for the season; pumpkin U-pick is expected back in September."
   },
   {
     "slug": "henna-blueberry-farm",
@@ -323,7 +323,7 @@
   {
     "slug": "bailey-farm",
     "name": "Bailey Farm",
-    "description": "Reference Pick-Your-Own produce farm in Snohomish, WA. Official website confirms current July 7-8 U-pick hours, location, phone, raspberry status, strawberry last-call status, and limited vegetable availability.",
+    "description": "Reference Pick-Your-Own produce farm in Snohomish, WA with berries, vegetables, and seasonal produce updates from the official farm website.",
     "addressLine1": "12968 Springhetti Road",
     "city": "Snohomish",
     "state": "WA",
@@ -360,6 +360,16 @@
     "isVerified": true,
     "cropSlugs": ["strawberry", "raspberry", "vegetables"],
     "amenitySlugs": [],
+    "policyNotes": [
+      {
+        "fieldName": "petPolicy",
+        "value": "No Pets Please",
+        "normalizedValue": { "petFriendly": false, "label": "No pets" },
+        "sourceUrl": "https://www.baileyveg.com/",
+        "confidenceScore": 96,
+        "notes": "Official Bailey Farm homepage lists No Pets Please."
+      }
+    ],
     "cropNotes": {
       "strawberry": "Official homepage said July 7 was last call for strawberries and some could still be found.",
       "raspberry": "Official homepage said raspberries opened again July 7 with good picking in all varieties and would likely close Thursday for ripening.",

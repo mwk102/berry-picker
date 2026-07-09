@@ -261,6 +261,13 @@
   font-weight: 750;
 }
 
+.farm-crop-status-main .crop-availability-details {
+  color: var(--color-forest-700);
+  font-size: 0.88rem;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
 .farm-crop-status strong,
 .farm-report strong,
 .announcement-list strong {
@@ -412,6 +419,12 @@
 .amenity.available {
   border-style: solid;
   background: var(--color-mint-50);
+}
+
+.amenity.unavailable {
+  border-style: solid;
+  border-color: rgba(185, 54, 95, 0.18);
+  background: #fbf1f3;
 }
 
 .amenities-unconfirmed {

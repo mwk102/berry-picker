@@ -1,3 +1,5 @@
+import { cropAvailabilityDetails } from './cropAvailabilityDetails'
+
 export const redmondOrigin = {
   latitude: 47.674,
   longitude: -122.1215,
@@ -128,6 +130,8 @@ function deriveOpenStatus(farm) {
 
 function getCropPriceRows(farm) {
   return (farm.crops || []).map((farmCrop) => {
+    const latestReport = getLatestReport(farmCrop.reports)
+    const details = cropAvailabilityDetails(farm, farmCrop)
     const prices = [...(farmCrop.prices || [])].filter(
       (price) => typeof price.amount === 'number',
     )
@@ -138,8 +142,11 @@ function getCropPriceRows(farm) {
 
     return {
       cropSlug: farmCrop.crop?.slug,
+      crop: farmCrop.crop,
       cropName: farmCrop.crop?.name || 'Crop',
       availability: getCropAvailability(farmCrop),
+      availabilityDetails: details,
+      latestReport,
       hasPrice: Boolean(lowestPrice),
       label: formatPrice(lowestPrice),
       price: lowestPrice,
@@ -270,6 +277,53 @@ function getFreshnessSummary(farm) {
   }
 }
 
+function getPickingSummary(cropPriceRows, farm) {
+  if (cropPriceRows.length === 0) {
+    return {
+      status: 'unknown',
+      label: 'Picking status unknown',
+      detail: 'Needs current crop information',
+    }
+  }
+
+  const rowPriority = {
+    unavailable: 0,
+    limited: 1,
+    available: 2,
+    upcoming: 3,
+    unknown: 4,
+  }
+  const sortedRows = [...cropPriceRows].sort(
+    (first, second) =>
+      (rowPriority[first.availability?.status] ?? 9) - (rowPriority[second.availability?.status] ?? 9) ||
+      first.cropName.localeCompare(second.cropName),
+  )
+  const details = sortedRows.slice(0, 4).map((row) => {
+    const label = row.availability?.label || 'needs review'
+    const detail = row.availabilityDetails?.label ? `: ${row.availabilityDetails.label}` : ''
+    return `${row.cropName} ${label.toLowerCase()}${detail}`
+  })
+  const unavailableCount = cropPriceRows.filter((row) => row.availability?.status === 'unavailable').length
+  const limitedCount = cropPriceRows.filter((row) => row.availability?.status === 'limited').length
+  const availableCount = cropPriceRows.filter((row) => row.availability?.status === 'available').length
+  const latestReport = cropPriceRows
+    .map((row) => row.latestReport)
+    .filter(Boolean)
+    .sort((first, second) => new Date(second.createdAt) - new Date(first.createdAt))[0]
+
+  let status = 'unknown'
+  if (availableCount > 0) status = 'fresh'
+  if (limitedCount > 0) status = 'limited'
+  if (unavailableCount === cropPriceRows.length) status = 'unavailable'
+  if (farm.isUnverifiedCandidate) status = 'low'
+
+  return {
+    status,
+    label: latestReport ? `Current picking status - updated ${formatShortDate(latestReport.createdAt)}` : 'Current picking status',
+    detail: details.join('; '),
+  }
+}
+
 export function normalizeFarm(apiFarm) {
   const berryTypes = apiFarm.crops?.map((farmCrop) => farmCrop.crop?.name).filter(Boolean) || []
   const cropSlugs = apiFarm.crops?.map((farmCrop) => farmCrop.crop?.slug).filter(Boolean) || []
@@ -302,6 +356,7 @@ export function normalizeFarm(apiFarm) {
     cropPriceRows,
     priceSummaryLabel: getPriceSummary(cropPriceRows),
     freshnessSummary: getFreshnessSummary(apiFarm),
+    pickingSummary: getPickingSummary(cropPriceRows, apiFarm),
     ...price,
   }
 }

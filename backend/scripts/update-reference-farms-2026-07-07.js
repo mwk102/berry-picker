@@ -543,7 +543,7 @@ async function refreshBailey() {
   const sourceUrl = 'https://www.baileyveg.com/'
 
   await markFarmReviewed(farm, {
-    description: 'Reference Pick-Your-Own produce farm in Snohomish, WA. Official website confirms current July 7-8 U-pick hours, location, phone, raspberry status, strawberry last-call status, and limited vegetable availability.',
+    description: 'Reference Pick-Your-Own produce farm in Snohomish, WA with berries, vegetables, and seasonal produce updates from the official farm website.',
   })
   await hideStaleDevelopmentAnnouncement(farm.id)
   await retireOlderApprovedReports(farm.id)
@@ -656,6 +656,22 @@ async function refreshBailey() {
     verifiedAt: REVIEWED_AT,
     expiresAt: BAILEY_UPDATE_EXPIRES,
     verificationMethod: 'manual_official_website_review',
+  })
+  await upsertEvidence({
+    farmId: farm.id,
+    evidenceType: 'AMENITY',
+    fieldName: 'petPolicy',
+    value: 'No Pets Please',
+    normalizedValue: { petFriendly: false, label: 'No pets' },
+    sourceName: 'Bailey Farm official website',
+    sourceUrl,
+    sourceType: 'OFFICIAL_WEBSITE',
+    confidenceScore: 96,
+    observedAt: REVIEWED_AT,
+    verifiedAt: REVIEWED_AT,
+    expiresAt: new Date('2026-10-31T08:00:00.000-07:00'),
+    verificationMethod: 'manual_official_website_review',
+    notes: 'Official homepage lists No Pets Please.',
   })
   await upsertAnnouncement({
     farmId: farm.id,

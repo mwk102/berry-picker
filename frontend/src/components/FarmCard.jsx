@@ -43,9 +43,9 @@ export function FarmCard({ farm, isSelected, onSelect }) {
         <span className="farm-card-name">{farm.name}</span>
         <span className="farm-card-description">{farm.description}</span>
 
-        <span className={`freshness-chip ${farm.freshnessSummary?.status || 'unknown'}`}>
-          <strong>{farm.freshnessSummary?.label || 'Freshness unknown'}</strong>
-          <span>{farm.freshnessSummary?.detail || 'Needs a current check'}</span>
+        <span className={`picking-summary-chip ${farm.pickingSummary?.status || 'unknown'}`}>
+          <strong>{farm.pickingSummary?.label || 'Current picking status'}</strong>
+          <span>{farm.pickingSummary?.detail || 'Needs a current check'}</span>
         </span>
 
         <span className="berry-chip-list" aria-label={`${farm.name} crop types`}>
@@ -54,8 +54,11 @@ export function FarmCard({ farm, isSelected, onSelect }) {
               className={`finder-crop-status ${cropRow.availability?.status || 'unknown'}`}
               key={cropRow.cropSlug || cropRow.cropName}
             >
-              <BerryChip>{cropRow.cropName}</BerryChip>
+              <BerryChip crop={cropRow.crop}>{cropRow.cropName}</BerryChip>
               {cropRow.availability?.label ? <em>{cropRow.availability.label}</em> : null}
+              {cropRow.availabilityDetails?.label ? (
+                <small>{cropRow.availabilityDetails.label}</small>
+              ) : null}
             </span>
           ))}
         </span>

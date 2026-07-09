@@ -11,10 +11,25 @@ const expectedAmenities = [
   { slug: 'wagon-rides', label: 'Wagon Rides' },
 ]
 
-export function FarmAmenitiesGrid({ amenities }) {
+function petPolicyFromEvidence(evidence = []) {
+  return evidence.find(
+    (record) =>
+      record.evidenceType === 'AMENITY' &&
+      record.fieldName === 'petPolicy' &&
+      record.normalizedValue?.petFriendly === false &&
+      record.status !== 'expired',
+  )
+}
+
+export function FarmAmenitiesGrid({ amenities, evidence = [] }) {
+  const noPetsPolicy = petPolicyFromEvidence(evidence)
   const availableAmenities = new Set(amenities.map((amenity) => amenity.slug))
-  const confirmedAmenities = expectedAmenities.filter((amenity) => availableAmenities.has(amenity.slug))
-  const unconfirmedAmenities = expectedAmenities.filter((amenity) => !availableAmenities.has(amenity.slug))
+  const confirmedAmenities = expectedAmenities.filter(
+    (amenity) => availableAmenities.has(amenity.slug) && !(noPetsPolicy && amenity.slug === 'pet-friendly'),
+  )
+  const unconfirmedAmenities = expectedAmenities.filter(
+    (amenity) => !availableAmenities.has(amenity.slug) && !(noPetsPolicy && amenity.slug === 'pet-friendly'),
+  )
 
   return (
     <section className="farm-panel">
@@ -29,9 +44,24 @@ export function FarmAmenitiesGrid({ amenities }) {
               {amenity.label}
             </span>
           ))}
+          {noPetsPolicy ? (
+            <span className="amenity unavailable">
+              <strong>Policy</strong>
+              {noPetsPolicy.normalizedValue?.label || 'No pets'}
+            </span>
+          ) : null}
         </div>
       ) : (
-        <p className="panel-muted">No amenities have been confirmed yet.</p>
+        noPetsPolicy ? (
+          <div className="amenities-grid">
+            <span className="amenity unavailable">
+              <strong>Policy</strong>
+              {noPetsPolicy.normalizedValue?.label || 'No pets'}
+            </span>
+          </div>
+        ) : (
+          <p className="panel-muted">No amenities have been confirmed yet.</p>
+        )
       )}
       {unconfirmedAmenities.length > 0 ? (
         <p className="amenities-unconfirmed">

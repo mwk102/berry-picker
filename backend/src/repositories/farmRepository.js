@@ -1,9 +1,17 @@
 function createFarmInclude(now = new Date()) {
+  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+  const approvedReportWhere = {
+    isApproved: true,
+  }
+
   return {
   hours: {
     orderBy: [{ dayOfWeek: 'asc' }, { openTime: 'asc' }],
   },
   specialHours: {
+    where: {
+      date: { gte: today },
+    },
     orderBy: { date: 'asc' },
   },
   amenities: {
@@ -17,9 +25,7 @@ function createFarmInclude(now = new Date()) {
         orderBy: [{ effectiveStartDate: 'desc' }, { createdAt: 'desc' }],
       },
       reports: {
-        where: {
-          isApproved: true,
-        },
+        where: approvedReportWhere,
         include: { crop: true },
         orderBy: [{ createdAt: 'desc' }, { updatedAt: 'desc' }],
         take: 3,
@@ -31,9 +37,7 @@ function createFarmInclude(now = new Date()) {
     orderBy: [{ effectiveStartDate: 'desc' }, { createdAt: 'desc' }],
   },
   reports: {
-    where: {
-      isApproved: true,
-    },
+    where: approvedReportWhere,
     include: { crop: true },
     orderBy: [{ createdAt: 'desc' }, { updatedAt: 'desc' }],
     take: 5,

@@ -148,6 +148,14 @@ type FarmImport = {
   }>;
   announcementSourceUrl?: string;
   announcement?: string;
+  policyNotes?: {
+    fieldName: string;
+    value: string;
+    normalizedValue: Record<string, unknown>;
+    sourceUrl?: string;
+    confidenceScore?: number;
+    notes?: string;
+  }[];
 };
 
 const washingtonFarms = JSON.parse(
@@ -792,6 +800,20 @@ async function seedEvidence() {
         expiresAt: evidenceExpiry(90, observedAt),
         confidenceScore: 62,
         notes: "Amenities remain lower-confidence until each amenity is confirmed from official source text or owner review.",
+      });
+    }
+
+    for (const policyNote of farmImport.policyNotes || []) {
+      evidenceInputs.push({
+        ...baseEvidence,
+        evidenceType: "AMENITY",
+        fieldName: policyNote.fieldName,
+        value: policyNote.value,
+        normalizedValue: policyNote.normalizedValue,
+        sourceUrl: policyNote.sourceUrl || homepageSource,
+        expiresAt: evidenceExpiry(90, observedAt),
+        confidenceScore: policyNote.confidenceScore || farmImport.verificationConfidence || 90,
+        notes: policyNote.notes || "Policy evidence sourced from official farm text.",
       });
     }
 

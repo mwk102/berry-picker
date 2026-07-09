@@ -3,9 +3,9 @@
 ## Verification Status
 
 - Status: Gold Standard reference farm
-- Last checked: 2026-07-02
-- Next review target: 2026-07-09
-- Verification confidence: 95/100
+- Last checked: 2026-07-08
+- Next review target: 2026-07-11
+- Verification confidence: 96/100
 - Completeness score: 89/100
 - Official website: https://harvoldberryfarm.com/
 - Source page: https://harvoldberryfarm.com/location-%26-price
@@ -62,8 +62,10 @@ Harvold Berry Farm and Veggies
 
 ## Current Status Notes
 
-- Homepage update lists strawberry field activity at 7701 Carnation Duvall Rd NE.
-- Homepage update lists raspberry picking at 5207 Carnation Duvall Rd NE and a next-picking update around July 1.
+- Homepage update reviewed July 8 says strawberry season is closed for 2026.
+- Homepage update reviewed July 8 says raspberry is closed and next picking is Saturday July 11 at 5207 Carnation-Duvall Rd NE.
+- Product-provided official update graphic says the July 11 raspberry picking window is 8:00 AM to 1:00 PM, or picked out, whichever comes first.
+- The update recommends Henna Blueberries for blueberries and Bailey Farm for a similar raspberry variety; those cross-farm recommendations are not stored as Harvold crop availability.
 - Farm website warns field status can change when picked out.
 
 ## Source Attribution
@@ -77,7 +79,8 @@ Harvold Berry Farm and Veggies
 | Strawberry price | Location & Price page | https://harvoldberryfarm.com/location-%26-price | 2026-07-02 | Manual official website review |
 | Raspberry price | Location & Price page | https://harvoldberryfarm.com/location-%26-price | 2026-07-02 | Manual official website review |
 | Normal hours | Homepage update | https://harvoldberryfarm.com/ | 2026-07-02 | Manual official website review |
-| Current berry status | Homepage update | https://harvoldberryfarm.com/ | 2026-07-02 | Manual official website review |
+| Current berry status | Homepage update | https://harvoldberryfarm.com/ | 2026-07-08 | Manual official website review |
+| Next raspberry picking hours | Official update graphic provided by product review | https://harvoldberryfarm.com/ | 2026-07-08 | Manual official update graphic review |
 
 ## Completeness
 

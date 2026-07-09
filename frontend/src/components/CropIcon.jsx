@@ -1,6 +1,7 @@
 import {
   GiAppleCore,
   GiBerriesBowl,
+  GiCarrot,
   GiCherry,
   GiCorn,
   GiFlowers,
@@ -31,6 +32,9 @@ const iconByCrop = {
   pumpkin: GiPumpkin,
   sunflower: GiSunflower,
   lavender: GiFlowers,
+  vegetable: GiCarrot,
+  vegetables: GiCarrot,
+  leaf: GiCarrot,
   'corn-maze': GiMaze,
   corn: GiCorn,
   'christmas-tree': GiPineTree,

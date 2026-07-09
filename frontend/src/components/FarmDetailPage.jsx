@@ -22,6 +22,7 @@ import {
 } from './FarmDetailUtils'
 import { useFarm } from '../hooks/useFarms'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { cropAvailabilityDetails } from '../lib/cropAvailabilityDetails'
 import './FarmDetailPage.css'
 
 function FarmDetailSkeleton() {
@@ -67,6 +68,7 @@ function buildCropStatuses(farm) {
     return {
       ...farmCrop,
       name: farmCrop.crop?.name || 'Crop',
+      availabilityDetails: cropAvailabilityDetails(farm, farmCrop),
       latestReport,
       stage: stageFromLatestReport(latestReport, seasonStageForCrop(farmCrop)),
       confidenceScore,
@@ -149,7 +151,7 @@ export function FarmDetailPage() {
           <HarvestTimeline cropStatuses={cropStatuses} />
           <FarmPersonalityPanel personality={farm.verificationProfile?.personality} />
           <FarmPricePanel prices={priceRows} />
-          <FarmAmenitiesGrid amenities={farm.amenities || []} />
+          <FarmAmenitiesGrid amenities={farm.amenities || []} evidence={farm.evidence || []} />
         </div>
 
         <div className="farm-detail-column">

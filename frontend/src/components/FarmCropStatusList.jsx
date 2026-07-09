@@ -52,6 +52,11 @@ export function FarmCropStatusList({ cropStatuses }) {
                 <span>
                   {formatDate(farmCrop.seasonStartDate)} - {formatDate(farmCrop.seasonEndDate)}
                 </span>
+                {farmCrop.availabilityDetails?.label ? (
+                  <span className="crop-availability-details">
+                    Available now: {farmCrop.availabilityDetails.label}
+                  </span>
+                ) : null}
               </div>
               <SeasonStageBadge stage={currentBadgeStage(farmCrop, latestReport)} />
               <span>{reportText(latestReport)}</span>

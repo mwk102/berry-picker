@@ -51,13 +51,14 @@ export function reportFreshnessDays(report) {
 export function farmFreshnessSummary(farm) {
   const evidence = [...(farm.evidence || [])]
   const evidenceTypePriority = {
-    HARVEST_STATUS: 0,
-    CROP_AVAILABILITY: 1,
+    CROP_AVAILABILITY: 0,
+    HOURS: 1,
+    HARVEST_STATUS: 2,
   }
   const latestHarvestEvidence = evidence
     .filter((record) =>
       ['FIELD_OBSERVATION', 'OFFICIAL_WEBSITE', 'FARM_OWNER', 'ADMIN_RESEARCH'].includes(record.sourceType) &&
-      ['HARVEST_STATUS', 'CROP_AVAILABILITY'].includes(record.evidenceType),
+      ['HARVEST_STATUS', 'CROP_AVAILABILITY', 'HOURS'].includes(record.evidenceType),
     )
     .sort(
       (first, second) =>
